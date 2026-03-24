@@ -134,3 +134,11 @@ Find the Confluence page about the onboarding process
 - **The official Atlassian MCP server** is a remote server at `https://mcp.atlassian.com/v1/mcp`, using OAuth 2.1.
 - `mcp-remote` is only a local proxy to handle the OAuth redirect — it is **not** the actual MCP server.
 - The OAuth token after login is stored at `~/.mcp-auth/` (automatic, no additional configuration needed).
+
+---
+
+## Also Using Cursor?
+
+The OAuth token at `~/.mcp-auth/` is shared — no re-authentication needed. Just add the same `mcpServers` config to `~/.cursor/mcp.json`.
+
+→ [Setting Up MCP for Cursor](./cursor-mcp.md)

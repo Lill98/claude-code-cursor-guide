@@ -1,15 +1,17 @@
-# Template: Cursor Rules (.mdc files)
+# Template: Cursor Rules
 
-Rules are `.mdc` files in `.cursor/rules/` that give Cursor persistent context about your project. Each rule has YAML frontmatter controlling when it applies, followed by markdown content.
+Rules give Cursor persistent context about your project. They live in `.cursor/rules/` as `.md` or `.mdc` files with YAML frontmatter.
+
+> **Scope note:** Rules apply to **Agent (Chat) only**. They do not apply to Cursor Tab (inline completions) or Inline Edit (Cmd+K).
 
 ---
 
 ## How to Create a Rule
 
-1. Create a file at `.cursor/rules/your-rule-name.mdc`
-2. Add YAML frontmatter with scope configuration
-3. Write the rule content in markdown
-4. Cursor automatically picks it up — no restart needed
+Three ways:
+1. **Chat:** Type `/create-rule` and describe what you need — Cursor creates the file for you
+2. **Settings UI:** `Cursor Settings > Rules, Commands` → `+ Add Rule`
+3. **Manual:** Create `.cursor/rules/your-rule-name.md` directly
 
 ---
 
@@ -37,11 +39,11 @@ Your rule content here — conventions, patterns, examples...
 
 ---
 
-## Three Scoping Modes
+## Four Scoping Modes
 
 ### 1. Always Apply
 
-For universal project context that should be active in every conversation:
+Active in every Agent conversation, regardless of which files are open:
 
 ```yaml
 ---
@@ -52,9 +54,24 @@ alwaysApply: true
 
 Use for: project overview, architecture, team conventions that apply everywhere.
 
-### 2. File-Scoped
+### 2. Apply Intelligently
 
-For rules that only matter when working with specific file types:
+Agent reads the `description` and decides whether to apply the rule based on relevance to the current task:
+
+```yaml
+---
+description: Prisma multi-tenant query patterns — filter by firmId and deletedAt
+alwaysApply: false
+---
+```
+
+No `globs` field, `alwaysApply: false`. The `description` field is what drives the decision — write it to clearly describe when this rule is relevant.
+
+Use for: rules that are only useful for certain tasks but hard to scope to specific file patterns.
+
+### 3. Apply to Specific Files
+
+Activates when files matching the glob pattern are open or being edited:
 
 ```yaml
 ---
@@ -73,9 +90,9 @@ Common glob patterns:
 - `**/*.prisma` — Prisma schema files
 - `**/*.{ts,tsx}` — TypeScript and TSX files
 
-### 3. Manual
+### 4. Apply Manually
 
-For rules you only want when explicitly referenced:
+Only activates when explicitly referenced using `@rule-name` in the chat:
 
 ```yaml
 ---
@@ -84,7 +101,9 @@ alwaysApply: false
 ---
 ```
 
-No `globs` field — the rule only activates when the user mentions it or selects it from the rule picker.
+No `globs`, `alwaysApply: false`. User types `@migration-guide` to include this rule in the conversation.
+
+Use for: reference guides, one-off procedures, or rules you want full control over.
 
 ---
 
@@ -145,14 +164,24 @@ Split your project context into focused rules instead of one giant file:
 
 ---
 
+## Alternative: `AGENTS.md`
+
+For simpler cases, Cursor also supports plain `AGENTS.md` files in the project root or subdirectories — no frontmatter required. These are always active and apply to the directory they're placed in (and subdirectories).
+
+Use `.cursor/rules/*.md` when you need scoping (globs, always, intelligent). Use `AGENTS.md` when you want a simple, flat rules file with no configuration.
+
+---
+
 ## Cursor Rules vs Claude Code Rules
 
-| Aspect | Cursor (`.mdc`) | Claude Code (`CLAUDE.md`) |
+| Aspect | Cursor (`.md`/`.mdc`) | Claude Code (`CLAUDE.md`) |
 |--------|-----------------|--------------------------|
 | File count | Multiple files, one per concern | Single file |
-| Scoping | Glob patterns per file | Always active |
+| Scoping | 4 modes: always, intelligent, glob, manual | Always active |
+| Manual invocation | `@rule-name` in chat | N/A |
 | Format | YAML frontmatter + markdown | Plain markdown |
 | Location | `.cursor/rules/` | Project root |
+| Applies to | Agent (Chat) only | All Claude Code tasks |
 | Line limit | ~50 lines per file recommended | ~200 lines total recommended |
 
 If you use both tools, you can maintain separate rules for each — the content is similar, but the format and organization differ.

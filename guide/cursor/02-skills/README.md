@@ -1,36 +1,42 @@
 # Template: Cursor Skills (SKILL.md)
 
-Skills are directories in `.cursor/skills/` (project-level) or `~/.cursor/skills/` (personal, cross-project) that teach Cursor's agent how to perform specific tasks. Each skill contains a `SKILL.md` file with YAML frontmatter and markdown instructions.
+Skills are directories containing a `SKILL.md` file that teach Cursor's agent how to perform specific tasks. Cursor automatically discovers them at startup from known skill directories.
 
 ---
 
 ## How to Create a Skill
 
-1. Create a directory: `.cursor/skills/your-skill-name/`
+1. Create a directory: `.agents/skills/your-skill-name/`
 2. Create `SKILL.md` inside with YAML frontmatter
-3. Optionally add reference files (`reference.md`, `examples.md`, scripts)
+3. Optionally add `scripts/`, `references/`, or `assets/` subdirectories
 4. Cursor automatically discovers it — no restart needed
+5. Invoke manually via `/skill-name` in Agent chat, or let the agent apply it automatically
 
 ---
 
 ## Directory Structure
 
 ```
-.cursor/skills/
-└── your-skill-name/
+.agents/skills/
+└── your-skill-name/          # Folder name must match the `name` field in SKILL.md
     ├── SKILL.md              # Required — main instructions
-    ├── reference.md          # Optional — detailed documentation
-    ├── examples.md           # Optional — usage examples
-    └── scripts/              # Optional — utility scripts
-        └── helper.sh
+    ├── scripts/              # Optional — executable scripts the agent can run
+    │   └── helper.sh
+    ├── references/           # Optional — additional docs loaded on demand
+    │   └── api-reference.md
+    └── assets/               # Optional — templates, images, data files
+        └── template.ts
 ```
 
 ### Storage Locations
 
 | Type | Path | Scope |
 |------|------|-------|
-| **Project** | `.cursor/skills/skill-name/` | Shared with the team via the repo |
+| **Project** (preferred) | `.agents/skills/skill-name/` | Shared with the team via the repo |
+| **Project** (also works) | `.cursor/skills/skill-name/` | Shared with the team via the repo |
 | **Personal** | `~/.cursor/skills/skill-name/` | Available across all your projects |
+
+> Legacy paths `.claude/skills/` and `.codex/skills/` are also recognized for compatibility.
 
 ---
 
@@ -53,10 +59,14 @@ Concrete examples of using this skill.
 
 ### Frontmatter Fields
 
-| Field | Requirements | Purpose |
-|-------|-------------|---------|
-| `name` | Max 64 chars, lowercase letters/numbers/hyphens only | Unique identifier |
-| `description` | Max 1024 chars, non-empty | Helps the agent decide when to apply this skill |
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name` | Yes | Lowercase letters, numbers, hyphens only. **Must match the parent folder name.** |
+| `description` | Yes | Helps the agent decide when to apply this skill. Be specific about trigger scenarios. |
+| `disable-model-invocation` | No | Set to `true` to disable automatic invocation — skill only activates when user types `/skill-name` explicitly |
+| `license` | No | License name or file reference |
+| `compatibility` | No | Environment requirements |
+| `metadata` | No | Arbitrary key-value pairs |
 
 ---
 
@@ -171,14 +181,16 @@ Show input/output examples so the agent understands the expected quality level.
 
 | Aspect | Cursor (`SKILL.md`) | Claude Code (`.claude/commands/*.md`) |
 |--------|---------------------|--------------------------------------|
-| Location | `.cursor/skills/skill-name/SKILL.md` | `.claude/commands/skill-name.md` |
-| Metadata | YAML frontmatter (`name`, `description`) | None (file name is the command name) |
+| Preferred location | `.agents/skills/skill-name/SKILL.md` | `.claude/commands/skill-name.md` |
+| Metadata | YAML frontmatter (`name`, `description`, optional fields) | None (file name is the command name) |
 | Discovery | Auto-detected by description matching | User types `/skill-name` explicitly |
-| Invocation | Automatic or manual | Always manual (slash command) |
-| Supporting files | Can include reference docs, scripts | Single markdown file only |
+| Invocation | Automatic or `/skill-name` | Always manual (slash command) |
+| Disable auto-invoke | `disable-model-invocation: true` | N/A — always manual |
+| Supporting files | `scripts/`, `references/`, `assets/` dirs | Single markdown file only |
 | Personal scope | `~/.cursor/skills/` | `~/.claude/commands/` |
+| Folder name | Must match `name` field | N/A |
 
-The key difference: Claude Code skills are always invoked explicitly via slash commands, while Cursor skills can be automatically applied when the agent detects a matching task.
+The key difference: Claude Code skills are always invoked explicitly via slash commands, while Cursor skills are automatically applied when the agent detects a matching task (unless `disable-model-invocation: true`).
 
 ---
 

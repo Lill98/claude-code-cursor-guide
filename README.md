@@ -19,11 +19,14 @@ Both tools can be customized to understand your project's stack, conventions, an
 │   │   ├── 01-rules/               # CLAUDE.md — project context
 │   │   ├── 02-commands/            # Slash commands
 │   │   ├── 03-hooks/               # Automated quality gates
-│   │   └── 04-skills/              # Advanced prompt engineering
+│   │   ├── 04-skills/              # Advanced prompt engineering
+│   │   └── 05-tdd/                 # TDD workflow: spec → tests → implementation
 │   └── cursor/                      # Cursor specific
-│       ├── README.md               # Overview of 2 concepts
+│       ├── README.md               # Overview of 4 concepts
 │       ├── 01-rules/               # .cursor/rules/*.mdc files
-│       └── 02-skills/              # .cursor/skills/*/SKILL.md
+│       ├── 02-skills/              # .cursor/skills/*/SKILL.md
+│       ├── 03-tdd/                 # TDD workflow: spec-to-tests Skill + stop hook + Husky
+│       └── 04-hooks/               # .cursor/hooks.json auto-run scripts
 ├── setup/
 │   └── atlassian-mcp.md            # Connect Jira/Confluence via MCP
 ├── examples/
@@ -43,17 +46,19 @@ Start with the [Guide Overview](guide/README.md) to understand the concepts and 
 
 | Tool | Concepts | Start Here |
 |------|----------|------------|
-| **Claude Code** | Rules, Commands, Hooks, Skills | [guide/claude-code/](guide/claude-code/README.md) |
-| **Cursor** | Rules, Skills | [guide/cursor/](guide/cursor/README.md) |
+| **Claude Code** | Rules, Commands, Hooks, Skills, TDD Workflow | [guide/claude-code/](guide/claude-code/README.md) |
+| **Cursor** | Rules, Skills, Subagents, Hooks, TDD Workflow | [guide/cursor/](guide/cursor/README.md) |
 
 ### 2. Concept Comparison
 
 | Concept | Claude Code | Cursor |
 |---------|------------|--------|
-| **Rules** | Single `CLAUDE.md` at project root | Multiple `.cursor/rules/*.mdc` with glob scoping |
+| **Rules** | Single `CLAUDE.md` at project root | Multiple `.cursor/rules/*.md` with 4 scoping modes |
 | **Commands** | `.claude/commands/*.md` slash commands | -- |
-| **Hooks** | `.claude/settings.json` auto-run scripts | -- |
-| **Skills** | Advanced commands in `.claude/commands/` | `.cursor/skills/*/SKILL.md` with auto-discovery |
+| **Hooks** | `.claude/settings.json` auto-run scripts | `.cursor/hooks.json` auto-run scripts |
+| **Skills** | Advanced commands in `.claude/commands/` | `.agents/skills/*/SKILL.md` with auto-discovery |
+| **Subagents** | -- | `.cursor/agents/*.md` — multi-step agents with own context |
+| **TDD Workflow** | `/spec-to-tests` skill + Stop hook + Husky | `spec-to-tests` Skill + `stop` hook + Husky |
 | **MCP** | Supported | Supported |
 
 ### 3. Set Up Your Project
@@ -78,7 +83,8 @@ mkdir -p your-project/.cursor/skills/write-test
 
 ### 4. Connect External Tools (Optional)
 
-- [Atlassian MCP Setup](setup/atlassian-mcp.md) — Connect Jira & Confluence
+- [Atlassian MCP for Claude Code](setup/atlassian-mcp.md) — Connect Jira & Confluence to Claude Code
+- [MCP for Cursor](setup/cursor-mcp.md) — Reuse the same MCP servers in Cursor (no reinstall needed)
 
 ## What's Inside
 
@@ -90,13 +96,17 @@ mkdir -p your-project/.cursor/skills/write-test
 | [Commands](guide/claude-code/02-commands/README.md) | Slash commands for repeatable workflows |
 | [Hooks](guide/claude-code/03-hooks/README.md) | Auto-run ESLint, Prettier, etc. after AI edits |
 | [Skills](guide/claude-code/04-skills/README.md) | Expert personas with prompt engineering |
+| [TDD Workflow](guide/claude-code/05-tdd/README.md) | Generate test stubs from spec; run tests before commit |
 
 ### Guide: Cursor
 
 | Section | What It Covers |
 |---------|---------------|
-| [Rules](guide/cursor/01-rules/README.md) | `.mdc` files — glob-scoped project conventions |
-| [Skills](guide/cursor/02-skills/README.md) | `SKILL.md` — auto-discovered expert workflows |
+| [Rules](guide/cursor/01-rules/README.md) | `.md` files — 4 scoping modes (always, intelligent, glob, manual) |
+| [Skills](guide/cursor/02-skills/README.md) | `SKILL.md` in `.agents/skills/` — auto-discovered single-purpose workflows |
+| [Subagents](guide/cursor/05-subagents/README.md) | `.cursor/agents/` — multi-step agents with own context window |
+| [TDD Workflow](guide/cursor/03-tdd/README.md) | `spec-to-tests` Skill + `stop` hook + Husky |
+| [Hooks](guide/cursor/04-hooks/README.md) | Auto-run formatters, tests, and safety gates |
 
 ### Examples
 
