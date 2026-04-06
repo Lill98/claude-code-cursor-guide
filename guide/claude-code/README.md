@@ -11,7 +11,7 @@ This document explains the 5 core mechanisms for customizing and extending Claud
 | **Rules** | `CLAUDE.md` at root | Every time Claude starts a task | Defining project conventions and fixed context |
 | **Commands** | `.claude/commands/*.md` | User types `/command-name` | Repeatable workflows, can be parameterized |
 | **Hooks** | `.claude/settings.json` → `hooks` | Automatically before/after tool calls | Enforcing quality gates automatically |
-| **Skills** | `.claude/commands/*.md` (complex prompt) | User types `/skill-name` | Specific expertise with detailed prompt engineering |
+| **Skills** | Built-in hoặc `.claude/commands/*.md` | User types `/skill-name` hoặc auto-trigger | Expertise với prompt engineering sâu; có built-in sẵn |
 | **TDD Workflow** | `.claude/commands/spec-to-tests.md` + `.claude/hooks/run-tests.sh` | `/spec-to-tests` + Stop event | Generate test stubs from spec in parallel with implementation |
 
 ---
@@ -34,9 +34,12 @@ This document explains the 5 core mechanisms for customizing and extending Claud
 - Example: After every file edit by Claude → ESLint runs automatically
 
 ### Skills — Use when:
+- Muốn dùng **built-in skills** có sẵn: `/simplify`, `/loop`, `/schedule`, `/claude-api`, `/research-ticket`
 - The workflow is complex and needs **detailed prompt engineering** with roles and few-shot examples
 - You want Claude to act as an "expert" in a specific domain
 - Example: `/review-pr` → Claude reviews code against an RBAC + Zod + test coverage checklist
+- Example: `/simplify` → Claude reviews và simplify code vừa thay đổi
+- Example: `/loop 5m /run-tests` → Chạy tests mỗi 5 phút tự động
 
 ### TDD Workflow — Use when:
 - You have a spec and want to write tests **before or alongside** the implementation

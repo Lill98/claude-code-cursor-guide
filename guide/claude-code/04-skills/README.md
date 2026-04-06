@@ -1,9 +1,58 @@
-# Template: Claude Code Skill
+# Claude Code Skills
 
-Skills are commands with more detailed prompt engineering. Technically, skills and commands are both `.md` files in `.claude/commands/`. The difference is in **design**:
+## Skills vs Commands — Phân biệt mới (2025)
 
-- **Command**: Clear step-by-step workflow, specific input/output
-- **Skill**: Claude takes on an "expert" role, with a persona, few-shot examples, and deeper analysis
+Skills là first-class feature của Claude Code, **không chỉ là commands phức tạp hơn**:
+
+| | Commands | Skills |
+|---|---|---|
+| **Lưu ở đâu** | `.claude/commands/*.md` | Built-in hoặc `.claude/commands/*.md` |
+| **Trigger** | User gõ `/command-name` | User gõ `/skill-name` **hoặc auto-trigger** theo context |
+| **Cơ chế** | Claude đọc file MD | Claude dùng `Skill` tool để invoke |
+| **Built-in** | Không | Có — nhiều skills pre-installed sẵn |
+| **Persona/Role** | Thường không cần | Thường có role/expertise rõ ràng |
+
+---
+
+## Built-in Skills (có sẵn, không cần cài)
+
+Claude Code hiện ship kèm các skills sau:
+
+| Skill | Trigger | Mô tả |
+|-------|---------|-------|
+| `update-config` | `/update-config` | Cấu hình Claude Code qua `settings.json` (hooks, behaviors) |
+| `keybindings-help` | `/keybindings-help` | Customize keyboard shortcuts trong `~/.claude/keybindings.json` |
+| `simplify` | `/simplify` | Review code vừa thay đổi, refactor cho gọn, chất lượng |
+| `loop` | `/loop 5m /foo` | Chạy lặp lại một command theo interval (mặc định 10m) |
+| `schedule` | `/schedule` | Tạo scheduled remote agents chạy theo cron schedule |
+| `claude-api` | Auto khi import `anthropic` | Hỗ trợ build apps với Claude API / Anthropic SDK |
+| `research-ticket` | `/research-ticket SH-164` | Research Jira ticket → tạo implementation spec |
+
+### Ví dụ dùng built-in skills
+
+```bash
+# Chạy /run-tests mỗi 5 phút
+/loop 5m /run-tests
+
+# Schedule một agent chạy mỗi sáng
+/schedule
+
+# Review và simplify code vừa edit
+/simplify
+
+# Config hooks tự động
+/update-config
+```
+
+---
+
+## Khi nào viết Custom Skill?
+
+Viết custom skill khi:
+- Workflow phức tạp cần **prompt engineering chi tiết** với role/persona
+- Muốn Claude đóng vai "chuyên gia" trong domain cụ thể (RBAC, test writing...)
+- Cần **few-shot examples** để định hướng output quality
+- Built-in skills không đủ
 
 ---
 
@@ -93,6 +142,32 @@ Expected output:
 - **Explicit checklist** — List specific quality criteria, Claude will self-verify
 - **Don't make it too long** — If the skill prompt exceeds 100 lines, consider splitting into 2 skills
 - **Test with edge cases** — Try the skill with "difficult" inputs to check behavior
+- **Prefer built-in skills first** — Trước khi viết custom skill, check xem built-in skills có đủ chưa
+
+---
+
+## Loop & Schedule — Automation Skills
+
+Hai skills đặc biệt để tự động hóa:
+
+### `/loop` — Chạy lặp theo interval
+```
+/loop [interval] [command]
+```
+```bash
+# Chạy /run-tests mỗi 5 phút
+/loop 5m /run-tests
+
+# Chạy /check-build mỗi 10 phút (mặc định)
+/loop /check-build
+```
+
+### `/schedule` — Cron jobs cho Claude agents
+Tạo scheduled remote agents chạy tự động theo cron schedule.
+```bash
+/schedule
+# Claude hỏi: command nào? schedule khi nào? → tạo cron trigger
+```
 
 ---
 
