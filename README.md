@@ -1,6 +1,12 @@
 # AI Tools Handbook — Claude Code & Cursor
 
-A practical guide to customizing and extending **Claude Code** and **Cursor** with Rules, Commands, Hooks, Skills, Subagents, MCP, and more.
+I've compiled a handbook on Claude Code and Cursor — drawing from Anthropic's official courses and my own hands-on experience.
+
+It covers: config hierarchy and CLAUDE.md setup, advanced features like Hooks, Skills, Commands, MCP, Subagents, TDD workflows, and some token optimization techniques that aren't well documented elsewhere.
+
+The structure is organized as a learning path — numbered sections from basics to advanced — so it's easy to follow whether you're just getting started or looking to go deeper. Each section includes a reusable template plus a real-world example you can copy directly into your project.
+
+> **Note:** The Claude Code guide is up to date. The Cursor guide is still a work in progress and will be updated over time.
 
 ## What Are These Tools?
 
