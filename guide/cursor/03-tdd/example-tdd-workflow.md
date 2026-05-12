@@ -1,6 +1,6 @@
-# Example: Parallel TDD for SH-164 — Invite User via Email (Cursor)
+# Example: Parallel TDD for PROJ-123 — New Feature (Cursor)
 
-End-to-end walkthrough of the TDD workflow in Cursor using the SH-164 spec.
+End-to-end walkthrough of the TDD workflow in Cursor using the PROJ-123 spec.
 
 ---
 
@@ -19,12 +19,12 @@ No restart needed — Cursor discovers the skill automatically.
 
 ## Step 1: Generate Test Stubs
 
-Have the spec file ready: `specs/SH-164.md`
+Have the spec file ready: `specs/PROJ-123.md`
 
 In Cursor chat:
 
 ```
-Generate test stubs from specs/SH-164.md for the InvitationService.
+Generate test stubs from specs/PROJ-123.md for the InvitationService.
 Output to src/modules/invitation/invitation.service.spec.ts
 ```
 
@@ -125,7 +125,7 @@ This is the "parallel" part — tests exist and describe the expected behavior b
 In Cursor, ask the agent to implement one method at a time:
 
 ```
-Implement InvitationService.inviteUser based on the spec in specs/SH-164.md
+Implement InvitationService.inviteUser based on the spec in specs/PROJ-123.md
 ```
 
 After each method is implemented, convert the corresponding `it.todo()` stubs to full assertions. Re-run vitest to confirm they turn green.
@@ -252,7 +252,7 @@ Fix the failing test, then re-run `git commit`.
 
 | Step | Cursor | Claude Code |
 |------|--------|-------------|
-| Generate stubs | "Generate test stubs from SH-164..." | `/spec-to-tests specs/SH-164.md src/...` |
+| Generate stubs | "Generate test stubs from PROJ-123..." | `/spec-to-tests specs/PROJ-123.md src/...` |
 | Auto-run tests after task | `stop` hook in `.cursor/hooks.json` | `Stop` hook in `.claude/settings.json` |
 | Block commit | Husky (same) | Husky (same) |
 | Output files | Same test file + scaffold | Same test file + scaffold |

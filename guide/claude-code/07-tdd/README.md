@@ -51,7 +51,7 @@ You are an experienced TDD practitioner working in a FastAPI/pytest codebase. Yo
 
 ## Input
 `$ARGUMENTS` contains two paths separated by a space:
-1. Path to the spec file (e.g. `specs/SH-164.md`)
+1. Path to the spec file (e.g. `specs/PROJ-123.md`)
 2. Path to the target test file (e.g. `tests/services/test_post_service.py`)
 
 ## Task
@@ -114,10 +114,10 @@ def [function_name](db: Session, current_user, dto) -> [ReturnType]:
 
 ```
 1. Have a spec file ready — either from /research-ticket or written manually
-   Example: specs/SH-164.md
+   Example: specs/PROJ-123.md
 
 2. In Claude Code, run:
-   /spec-to-tests specs/SH-164.md tests/services/test_post_service.py
+   /spec-to-tests specs/PROJ-123.md tests/services/test_post_service.py
 
 3. Claude generates two files:
    - tests/services/test_post_service.py  ← @pytest.mark.skip stubs, all skipped
@@ -271,4 +271,4 @@ The Stop hook catches problems early while you are still in a Claude session. pr
 
 ## See a Real-World Example
 
-[Example: Parallel TDD for SH-164 — Invite User via Email](./example-tdd-workflow.md)
+[Example: Parallel TDD for PROJ-123 — New Feature](./example-tdd-workflow.md)

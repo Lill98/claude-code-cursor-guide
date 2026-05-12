@@ -190,4 +190,4 @@ If you use both tools, you can maintain separate rules for each — the content 
 
 ## See a Real-World Example
 
-→ [example-saafehouse.md](./example-saafehouse.md)
+→ Copy the template above into `.cursor/rules/project-context.md` and adapt to your project.

@@ -1,6 +1,6 @@
 # Cursor: Rules, Skills, TDD Workflow
 
-This document explains how to customize Cursor's AI agent with persistent project context and expert workflows, with practical examples from the **saafehouse-be** project (NestJS + Prisma + RBAC + multi-tenant).
+This document explains how to customize Cursor's AI agent with persistent project context and expert workflows, with practical examples for a NestJS + Prisma project.
 
 ---
 
@@ -72,14 +72,14 @@ Skills have YAML frontmatter with `name` and `description` fields. The descripti
 
 ---
 
-## Quick Start for saafehouse-be
+## Quick Start
 
 ```bash
 # 1. Create the rules directory
 mkdir -p .cursor/rules
 
 # 2. Copy the example rules (split into focused .mdc files)
-# See: guide/cursor/01-rules/example-saafehouse.md for all rule files
+# See: guide/cursor/01-rules/README.md for all rule templates
 
 # 3. Create the skills directory
 mkdir -p .agents/skills/write-test

@@ -104,11 +104,11 @@ atlassian: npx -y mcp-remote@latest https://mcp.atlassian.com/v1/mcp - ✓ Conne
 Open Claude Code (`claude`) and try:
 
 ```
-Fetch ticket SH-164 from Jira and summarize it for me
+Fetch ticket PROJ-123 from Jira and summarize it for me
 ```
 
 ```
-Get all Open tickets in project SH assigned to me
+Get all Open tickets in project PROJ assigned to me
 ```
 
 ```

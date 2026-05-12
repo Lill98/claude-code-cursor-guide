@@ -185,4 +185,4 @@ exit 0
 
 ## See a Real-World Example
 
-→ [Example: Hooks for saafehouse-be](./example-saafehouse.md)
+→ See [README.md](./README.md) for the full template above.

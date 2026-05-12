@@ -58,7 +58,7 @@ Tệ:  "Add user invitation feature"
 Tốt: "Add an inviteUser() method to InvitationService 
       in src/modules/invitation/invitation.service.ts.
       
-      Requirements (từ spec specs/SH-164.md):
+      Requirements (từ spec specs/PROJ-123.md):
       - Tạo User với status: 'pending'
       - Gửi invitation email qua EmailService
       - Từ chối nếu email đã tồn tại trong cùng firm (throw ConflictException)

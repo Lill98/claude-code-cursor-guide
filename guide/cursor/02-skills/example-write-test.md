@@ -1,4 +1,4 @@
-# Example: Skill `write-test` for saafehouse-be
+# Example: Skill `write-test`
 
 This is the `SKILL.md` for a test-generation skill adapted for Cursor.
 Create the directory `.cursor/skills/write-test/` and place this content in `SKILL.md`.
@@ -17,7 +17,7 @@ description: Generate comprehensive Vitest unit tests for NestJS services with m
 
 ## Context
 
-The saafehouse-be project uses:
+This example uses:
 - **Vitest** (not Jest) for unit testing
 - **jest-mock-extended** `mockDeep<PrismaClient>()` to mock Prisma
 - Services receive PrismaService injected via constructor
@@ -192,10 +192,10 @@ name: review-pr
 description: Review code for multi-tenant security, NestJS conventions, Zod validation, and test coverage. Use when reviewing pull requests, code changes, diffs, or when the user asks for a code review.
 ---
 
-# Code Review — saafehouse-be
+# Code Review — my-project
 
 ## Context
-saafehouse-be is a multi-tenant SaaS. The most critical bug is data leakage between firms (missing firmId filter). Stack: NestJS + Prisma + Zod + Vitest + RBAC.
+my-project is a multi-tenant SaaS. The most critical bug is data leakage between firms (missing firmId filter). Stack: NestJS + Prisma + Zod + Vitest + RBAC.
 
 ## Review Checklist
 

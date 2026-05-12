@@ -1,16 +1,16 @@
 Research a Jira ticket and produce a clear implementation spec, then save it to a file.
 
 ## Input
-$ARGUMENTS — Jira ticket number (e.g. SH-164) or full URL (e.g. https://smartdevllc.atlassian.net/browse/SH-164)
+$ARGUMENTS — Jira ticket number (e.g. PROJ-123) or full URL (e.g. https://your-org.atlassian.net/browse/PROJ-123)
 
 ## Steps
 
 ### 1. Extract ticket key
-From the input, extract just the ticket key (e.g. `SH-164`). Strip any URL prefix if provided.
+From the input, extract just the ticket key (e.g. `PROJ-123`). Strip any URL prefix if provided.
 
 ### 2. Fetch Jira ticket
 Use the MCP tool `mcp__atlassian__getJiraIssue` with:
-- `cloudId`: `070e123d-8736-4c70-adcc-b56fd6c9ac3f`
+- `cloudId`: `<your-cloud-id>`
 - `issueIdOrKey`: the extracted ticket key
 
 Collect:
@@ -27,7 +27,7 @@ Collect:
 
 ### 3. Fetch Confluence pages (if any)
 For each Confluence page URL found in step 2, extract the page ID from the URL (the numeric segment, e.g. `4555407513` from `.../pages/4555407513/...`) then use the MCP tool `mcp__atlassian__getConfluencePage` with:
-- `cloudId`: `070e123d-8736-4c70-adcc-b56fd6c9ac3f`
+- `cloudId`: `<your-cloud-id>`
 - `pageId`: the extracted page ID
 
 Extract relevant sections: overview, business rules, UI specs, data flow, edge cases.
@@ -35,7 +35,7 @@ Note the page title and URL for reference.
 
 ### 4. Synthesize and save spec
 
-Compose the full spec in markdown using the structure below, then use the Write tool to save it as `specs/[TICKET-KEY].md` in the project root (e.g. `specs/SH-164.md`). Create the `specs/` folder if it doesn't exist.
+Compose the full spec in markdown using the structure below, then use the Write tool to save it as `specs/[TICKET-KEY].md` in the project root (e.g. `specs/PROJ-123.md`). Create the `specs/` folder if it doesn't exist.
 
 ---
 

@@ -91,12 +91,12 @@ Example: Claude spawns one subagent to read all spec files while another reads t
 ### MCP
 Use when Claude needs **live data from external systems** — Jira tickets, Confluence docs, database schemas, third-party APIs.
 
-Example: `/research-ticket SH-164` — Claude fetches the ticket, linked Confluence pages, and writes a structured implementation spec.
+Example: `/research-ticket PROJ-123` — Claude fetches the ticket, linked Confluence pages, and writes a structured implementation spec.
 
 ### TDD Workflow
 Use when you have a spec and want tests **written before or alongside implementation** — red tests first, then implementation makes them green.
 
-Example: `/spec-to-tests specs/SH-164.md src/modules/invitation/invitation.service.spec.ts` — generates `it.todo()` stubs from acceptance criteria.
+Example: `/spec-to-tests specs/PROJ-123.md src/modules/invitation/invitation.service.spec.ts` — generates `it.todo()` stubs from acceptance criteria.
 
 ### Tips
 Read when you want to understand **why Claude behaves a certain way** — how context windows work, when to compact, how to write prompts that survive long sessions.

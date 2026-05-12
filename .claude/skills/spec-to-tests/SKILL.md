@@ -24,12 +24,12 @@ The developer will fill in the implementations after you create the structure. Y
 ## Input
 
 `$ARGUMENTS` contains two paths separated by a space:
-1. Path to the spec file (e.g., `specs/SH-164.md`)
+1. Path to the spec file (e.g., `specs/PROJ-123.md`)
 2. Path to the target test file to create (e.g., `tests/services/test_invitation_service.py`)
 
 Example:
 ```
-/spec-to-tests specs/SH-164.md tests/services/test_invitation_service.py
+/spec-to-tests specs/PROJ-123.md tests/services/test_invitation_service.py
 ```
 
 ## Task

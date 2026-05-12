@@ -1,6 +1,6 @@
 ---
 name: research-ticket
-description: Research a Jira ticket using Atlassian MCP tools and produce a structured implementation spec saved to specs/[TICKET-KEY].md. Use when the user provides a Jira ticket number (e.g. SH-164) or a Jira URL and asks to research, spec, document, or analyze it. Requires Atlassian MCP to be configured.
+description: Research a Jira ticket using Atlassian MCP tools and produce a structured implementation spec saved to specs/[TICKET-KEY].md. Use when the user provides a Jira ticket number (e.g. PROJ-123) or a Jira URL and asks to research, spec, document, or analyze it. Requires Atlassian MCP to be configured.
 disable-model-invocation: true
 ---
 
@@ -16,12 +16,12 @@ Atlassian MCP must be configured in Cursor. See `setup/cursor-mcp.md`.
 
 ### 1. Extract ticket key
 
-From the user's message, extract just the ticket key (e.g. `SH-164`). Strip any URL prefix if the user provided a full URL (e.g. `https://smartdevllc.atlassian.net/browse/SH-164` → `SH-164`).
+From the user's message, extract just the ticket key (e.g. `PROJ-123`). Strip any URL prefix if the user provided a full URL (e.g. `https://your-org.atlassian.net/browse/PROJ-123` → `PROJ-123`).
 
 ### 2. Fetch Jira ticket
 
 Use the available Atlassian MCP tool to fetch the Jira issue with:
-- `cloudId`: `070e123d-8736-4c70-adcc-b56fd6c9ac3f`
+- `cloudId`: `<your-cloud-id>`
 - `issueIdOrKey`: the extracted ticket key
 
 Collect:
@@ -39,7 +39,7 @@ Collect:
 ### 3. Fetch Confluence pages (if any)
 
 For each Confluence page URL found in step 2, extract the page ID from the URL (the numeric segment, e.g. `4555407513` from `.../pages/4555407513/...`) then use the Atlassian MCP tool to fetch the Confluence page with:
-- `cloudId`: `070e123d-8736-4c70-adcc-b56fd6c9ac3f`
+- `cloudId`: `<your-cloud-id>`
 - `pageId`: the extracted page ID
 
 Extract relevant sections: overview, business rules, UI specs, data flow, edge cases.
@@ -47,7 +47,7 @@ Note the page title and URL for reference.
 
 ### 4. Synthesize and save spec
 
-Compose the full spec in markdown using the structure below, then save it to `specs/[TICKET-KEY].md` (e.g. `specs/SH-164.md`). Create the directory if it doesn't exist.
+Compose the full spec in markdown using the structure below, then save it to `specs/[TICKET-KEY].md` (e.g. `specs/PROJ-123.md`). Create the directory if it doesn't exist.
 
 ---
 
@@ -109,18 +109,18 @@ After saving the file, confirm to the user: `Spec saved to specs/[TICKET-KEY].md
 
 In Cursor Agent chat:
 ```
-/research-ticket SH-164
+/research-ticket PROJ-123
 ```
 or:
 ```
-/research-ticket https://smartdevllc.atlassian.net/browse/SH-164
+/research-ticket https://your-org.atlassian.net/browse/PROJ-123
 ```
 
 ## Comparing to Claude Code Version
 
 | Aspect | This Cursor Skill | Claude Code `/research-ticket` |
 |--------|-------------------|-------------------------------|
-| Invocation | `/research-ticket SH-164` (explicit only) | `/research-ticket SH-164` |
+| Invocation | `/research-ticket PROJ-123` (explicit only) | `/research-ticket PROJ-123` |
 | MCP tool | Atlassian MCP via `.cursor/mcp.json` | Atlassian MCP via `~/.claude.json` |
 | Output path | `specs/[KEY].md` | `specs/[KEY].md` |
 | Auto-invoke | Disabled (`disable-model-invocation: true`) | N/A — always explicit |

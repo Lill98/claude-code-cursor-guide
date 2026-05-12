@@ -144,7 +144,7 @@ Session A writes the code. Session B reviews it from a fresh context — no bias
 
 ```bash
 # Session A: implement
-claude "Implement the UserInvitation feature per specs/SH-164.md"
+claude "Implement the UserInvitation feature per specs/PROJ-123.md"
 
 # Session B (fresh): review
 claude "Review the changes in src/modules/invitation/ for security issues,

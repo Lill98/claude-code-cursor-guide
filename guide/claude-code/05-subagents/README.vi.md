@@ -162,7 +162,7 @@ Return a summary: which files, which functions, what data model.
 
 ```bash
 # Terminal 1 — session implement
-claude "Implement the UserInvitation feature per specs/SH-164.md"
+claude "Implement the UserInvitation feature per specs/PROJ-123.md"
 
 # Terminal 2 — session review (mở riêng, không liên quan)
 claude "Review the changes in src/modules/invitation/ for security issues,

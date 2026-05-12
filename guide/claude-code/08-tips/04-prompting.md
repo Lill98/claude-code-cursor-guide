@@ -58,7 +58,7 @@ Bad:  "Add user invitation feature"
 Good: "Add an inviteUser() method to InvitationService 
       in src/modules/invitation/invitation.service.ts.
       
-      Requirements (from spec specs/SH-164.md):
+      Requirements (from spec specs/PROJ-123.md):
       - Create a User with status: 'pending'
       - Send invitation email via EmailService
       - Reject if email already exists in the same firm (throw ConflictException)

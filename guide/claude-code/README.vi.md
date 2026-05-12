@@ -91,12 +91,12 @@ Ví dụ: Claude spawn một subagent đọc tất cả spec file trong khi agen
 ### MCP
 Dùng khi Claude cần **dữ liệu trực tiếp từ external system** — Jira ticket, Confluence docs, database schema, third-party API.
 
-Ví dụ: `/research-ticket SH-164` — Claude fetch ticket, linked Confluence pages, và viết spec implementation có cấu trúc.
+Ví dụ: `/research-ticket PROJ-123` — Claude fetch ticket, linked Confluence pages, và viết spec implementation có cấu trúc.
 
 ### TDD Workflow
 Dùng khi có spec và muốn tests được **viết trước hoặc song song với implementation** — test đỏ trước, implementation mới làm chúng xanh.
 
-Ví dụ: `/spec-to-tests specs/SH-164.md src/modules/invitation/invitation.service.spec.ts` — tạo `it.todo()` stubs từ acceptance criteria.
+Ví dụ: `/spec-to-tests specs/PROJ-123.md src/modules/invitation/invitation.service.spec.ts` — tạo `it.todo()` stubs từ acceptance criteria.
 
 ### Tips
 Đọc khi muốn hiểu **tại sao Claude hành xử theo một cách nhất định** — context window hoạt động ra sao, khi nào nên compact, cách viết prompt sống sót qua session dài.

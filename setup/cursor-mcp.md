@@ -96,13 +96,13 @@ Open Cursor and start the Agent. When it tries to use an Atlassian MCP tool for 
 Once connected, use the `research-ticket` skill to fetch Jira tickets:
 
 ```
-/research-ticket SH-164
+/research-ticket PROJ-123
 ```
 
 Or ask naturally:
 
 ```
-Fetch Jira ticket SH-164 and summarize the acceptance criteria
+Fetch Jira ticket PROJ-123 and summarize the acceptance criteria
 ```
 
 ---

@@ -7,7 +7,7 @@ description: Generate failing Vitest unit test stubs from a product spec or requ
 
 ## Context
 
-The saafehouse-be project uses:
+This example assumes:
 - **Vitest** (not Jest) for unit testing
 - **jest-mock-extended** `mockDeep<PrismaClient>()` to mock Prisma
 - Services receive PrismaService injected via constructor
@@ -91,10 +91,10 @@ describe('[ServiceName]', () => {
 
 ## Example
 
-User says: "Generate test stubs for SH-164 — the invitation feature"
+User says: "Generate test stubs for PROJ-123 — the invitation feature"
 
 Agent will:
-1. Read the spec file (e.g. `specs/SH-164.md`)
+1. Read the spec file (e.g. `specs/PROJ-123.md`)
 2. Extract behaviors from AC01–AC05
 3. Create `src/modules/invitation/invitation.service.spec.ts` with `it.todo()` stubs
 4. Create `src/modules/invitation/invitation.service.ts` scaffold

@@ -60,6 +60,6 @@ Output path: `specs/[TICKET-KEY].md`
 ## Do Not
 
 - Mix languages within a single `.md` file
-- Add saafehouse-specific content — keep examples generic
+- Add project-specific content — keep examples generic
 - Commit `.claude/settings.local.json` or `.env`
 - Create new floating docs at repo root — content belongs inside `guide/`

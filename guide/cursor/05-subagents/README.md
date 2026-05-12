@@ -130,14 +130,14 @@ is_background: false
 
 ---
 
-## Example Subagents for saafehouse-be
+## Example Subagents
 
 ### `verifier` — Validates completed implementations
 
 ```markdown
 ---
 name: verifier
-description: Validates completed feature implementations for saafehouse-be. Runs Vitest tests, checks firmId filters in Prisma queries, verifies Zod validation on all inputs, and confirms RBAC decorators are present. Use after implementing a new service or endpoint.
+description: Validates completed feature implementations. Runs Vitest tests, checks required filters in Prisma queries, verifies input validation, and confirms auth decorators are present. Use after implementing a new service or endpoint.
 model: inherit
 readonly: true
 is_background: false
@@ -201,4 +201,4 @@ Report final test results and a summary of what was fixed.
 
 ## See a Real-World Example
 
-→ [Example: Subagents for saafehouse-be](./example-saafehouse.md)
+→ Adapt the examples above to your project's specific tech stack and conventions.
