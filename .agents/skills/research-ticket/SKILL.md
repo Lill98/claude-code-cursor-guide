@@ -1,6 +1,6 @@
 ---
 name: research-ticket
-description: Research a Jira ticket using Atlassian MCP tools and produce a structured implementation spec saved to examples/specs/[TICKET-KEY].md. Use when the user provides a Jira ticket number (e.g. SH-164) or a Jira URL and asks to research, spec, document, or analyze it. Requires Atlassian MCP to be configured.
+description: Research a Jira ticket using Atlassian MCP tools and produce a structured implementation spec saved to specs/[TICKET-KEY].md. Use when the user provides a Jira ticket number (e.g. SH-164) or a Jira URL and asks to research, spec, document, or analyze it. Requires Atlassian MCP to be configured.
 disable-model-invocation: true
 ---
 
@@ -47,7 +47,7 @@ Note the page title and URL for reference.
 
 ### 4. Synthesize and save spec
 
-Compose the full spec in markdown using the structure below, then save it to `examples/specs/[TICKET-KEY].md` (e.g. `examples/specs/SH-164.md`). Create the directory if it doesn't exist.
+Compose the full spec in markdown using the structure below, then save it to `specs/[TICKET-KEY].md` (e.g. `specs/SH-164.md`). Create the directory if it doesn't exist.
 
 ---
 
@@ -103,7 +103,7 @@ List anything ambiguous or missing that needs clarification before coding.
 
 ---
 
-After saving the file, confirm to the user: `Spec saved to examples/specs/[TICKET-KEY].md`
+After saving the file, confirm to the user: `Spec saved to specs/[TICKET-KEY].md`
 
 ## Usage
 
@@ -122,5 +122,5 @@ or:
 |--------|-------------------|-------------------------------|
 | Invocation | `/research-ticket SH-164` (explicit only) | `/research-ticket SH-164` |
 | MCP tool | Atlassian MCP via `.cursor/mcp.json` | Atlassian MCP via `~/.claude.json` |
-| Output path | `examples/specs/[KEY].md` | `specs/[KEY].md` |
+| Output path | `specs/[KEY].md` | `specs/[KEY].md` |
 | Auto-invoke | Disabled (`disable-model-invocation: true`) | N/A — always explicit |

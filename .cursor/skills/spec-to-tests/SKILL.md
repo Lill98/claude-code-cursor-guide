@@ -94,7 +94,7 @@ describe('[ServiceName]', () => {
 User says: "Generate test stubs for SH-164 — the invitation feature"
 
 Agent will:
-1. Read the spec file (e.g. `examples/specs/SH-164.md`)
+1. Read the spec file (e.g. `specs/SH-164.md`)
 2. Extract behaviors from AC01–AC05
 3. Create `src/modules/invitation/invitation.service.spec.ts` with `it.todo()` stubs
 4. Create `src/modules/invitation/invitation.service.ts` scaffold

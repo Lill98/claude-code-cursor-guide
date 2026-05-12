@@ -7,7 +7,7 @@ Create each file in `.cursor/rules/` in your project.
 
 ## File 1: `.cursor/rules/project-context.mdc`
 
-```markdown
+````markdown
 ---
 description: Core project context for saafehouse-be — stack, architecture, and overview
 alwaysApply: true
@@ -54,13 +54,13 @@ modules/[name]/
     ├── create-[name].dto.ts
     └── update-[name].dto.ts
 ```
-```
+````
 
 ---
 
 ## File 2: `.cursor/rules/nestjs-patterns.mdc`
 
-```markdown
+````markdown
 ---
 description: NestJS conventions — controller/service patterns, Zod DTOs, naming, RBAC
 globs: "**/*.ts"
@@ -122,13 +122,13 @@ Services return raw data — `ResponseInterceptor` wraps automatically. Do not m
 ## DON'T
 - Do not use `class-validator` or `class-transformer`
 - Do not put business logic in controllers
-```
+````
 
 ---
 
 ## File 3: `.cursor/rules/prisma-conventions.mdc`
 
-```markdown
+````markdown
 ---
 description: Prisma ORM conventions — multi-tenant firmId filter, soft delete, UUID keys
 globs: "**/*.ts"
@@ -172,13 +172,13 @@ Use NestJS built-in exceptions:
 ## DON'T
 - Do not hard delete records
 - Do not skip `firmId` filter (multi-tenant security)
-```
+````
 
 ---
 
 ## File 4: `.cursor/rules/testing.mdc`
 
-```markdown
+````markdown
 ---
 description: Testing conventions — Vitest, mockDeep PrismaClient, test patterns
 globs: "**/*.spec.ts"
@@ -228,7 +228,7 @@ describe('FirmService', () => {
 ## DON'T
 - Do not use Jest
 - Do not skip firmId verification in tests
-```
+````
 
 ---
 

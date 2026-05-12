@@ -1,18 +1,3 @@
-# Example: Skills `/write-test` and `/review-pr` for blog-api
-
-Two skills for the blog-api project (FastAPI + SQLAlchemy + PostgreSQL + Pydantic v2 + pytest).
-
-Create `.claude/skills/write-test/SKILL.md` and `.claude/skills/review-pr/SKILL.md` using the content below.
-
-> If you are still using `.claude/commands/`, copying into `.claude/commands/write-test.md` also works.
-
----
-
-## Skill 1: `/write-test`
-
-`.claude/skills/write-test/SKILL.md`:
-
-```markdown
 ---
 name: write-test
 description: Write comprehensive pytest unit tests for a FastAPI service in blog-api. Use when asked to write tests, add test coverage, or test a service file. Covers SQLAlchemy session mocking, ownership checks, and role-based access.
@@ -71,7 +56,7 @@ Read the service file, analyze all public functions/methods, then write comprehe
 
 ## Output Format
 
-Create a test file at `tests/services/test_post_service.py`:
+Create `tests/conftest.py` with shared fixtures, then create the test file at `tests/services/test_<name>.py`:
 
 ```python
 # tests/conftest.py
@@ -120,11 +105,12 @@ def mock_post(mock_author):
     post.author_id = mock_author.id
     post.deleted_at = None
     return post
+```
 
-
+```python
 # tests/services/test_post_service.py
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from fastapi import HTTPException
 
 from app.services.post_service import (
@@ -145,7 +131,6 @@ def test_get_posts_reader_sees_published_only(mock_db, mock_reader, mock_post):
 
     result = get_posts(db=mock_db, current_user=mock_reader)
 
-    # Verify the status filter was applied
     assert result == [mock_post]
 
 
@@ -196,7 +181,7 @@ def test_get_post_raises_404_when_not_found(mock_db, mock_author):
 
 
 def test_get_post_raises_404_for_soft_deleted_post(mock_db, mock_author):
-    # Soft-deleted posts must not be returned (deleted_at filter)
+    # Soft-deleted posts must not be returned (deleted_at filter excludes them)
     mock_db.query.return_value.filter.return_value.first.return_value = None
 
     with pytest.raises(HTTPException) as exc_info:
@@ -213,11 +198,6 @@ def test_create_post_sets_author_id_and_draft_status(mock_db, mock_author):
     post_data.slug = "new-post"
     post_data.content = "Content."
 
-    created_post = MagicMock()
-    created_post.author_id = mock_author.id
-    created_post.status = "draft"
-
-    # Simulate db.add + db.commit + db.refresh pattern
     def fake_refresh(obj):
         obj.id = 10
         obj.author_id = mock_author.id
@@ -225,7 +205,7 @@ def test_create_post_sets_author_id_and_draft_status(mock_db, mock_author):
 
     mock_db.refresh.side_effect = fake_refresh
 
-    result = create_post(post_in=post_data, db=mock_db, current_user=mock_author)
+    create_post(post_in=post_data, db=mock_db, current_user=mock_author)
 
     mock_db.add.assert_called_once()
     mock_db.commit.assert_called_once()
@@ -251,30 +231,26 @@ def test_update_post_succeeds_when_author_owns_it(mock_db, mock_author, mock_pos
     update_data = MagicMock()
     update_data.title = "Updated Title"
 
-    result = update_post(post_id=1, post_in=update_data, db=mock_db, current_user=mock_author)
+    update_post(post_id=1, post_in=update_data, db=mock_db, current_user=mock_author)
 
     mock_db.commit.assert_called_once()
 
 
 def test_update_post_raises_403_when_author_does_not_own_it(mock_db, mock_author, mock_post):
-    other_author_id = 50
-    mock_post.author_id = other_author_id  # different owner
+    mock_post.author_id = 50  # different owner
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
-    update_data = MagicMock()
 
     with pytest.raises(HTTPException) as exc_info:
-        update_post(post_id=1, post_in=update_data, db=mock_db, current_user=mock_author)
+        update_post(post_id=1, post_in=MagicMock(), db=mock_db, current_user=mock_author)
 
     assert exc_info.value.status_code == 403
 
 
 def test_update_post_admin_can_update_any_post(mock_db, mock_admin, mock_post):
-    mock_post.author_id = 999  # different owner, but admin bypasses check
+    mock_post.author_id = 999  # different owner, admin bypasses check
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
-    update_data = MagicMock()
-    update_data.title = "Admin Edit"
 
-    result = update_post(post_id=1, post_in=update_data, db=mock_db, current_user=mock_admin)
+    update_post(post_id=1, post_in=MagicMock(), db=mock_db, current_user=mock_admin)
 
     mock_db.commit.assert_called_once()
 
@@ -294,7 +270,7 @@ def test_publish_post_transitions_draft_to_published(mock_db, mock_author, mock_
     mock_post.status = "draft"
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
 
-    result = publish_post(post_id=1, db=mock_db, current_user=mock_author)
+    publish_post(post_id=1, db=mock_db, current_user=mock_author)
 
     assert mock_post.status == "published"
     mock_db.commit.assert_called_once()
@@ -361,8 +337,9 @@ def test_delete_post_raises_404_when_post_not_found(mock_db, mock_author):
 ```
 
 ## Quality Checklist
+
 Before finishing, verify:
-- [ ] Every public function has at least 2 test cases (happy path + error)
+- [ ] Every public function has at least 2 test cases (happy path + at least one error case)
 - [ ] Queries are verified to filter `deleted_at.is_(None)`
 - [ ] Ownership checks are tested: author on own post (pass), author on other's post (403)
 - [ ] Role-based filtering is tested: reader gets published only, admin gets all
@@ -370,85 +347,4 @@ Before finishing, verify:
 - [ ] `delete_post` uses soft delete (`post.deleted_at = datetime.utcnow()`) — `db.delete()` is never called
 - [ ] All fixtures are defined in `conftest.py` and shared across test modules
 - [ ] HTTPException status codes match: 404 not found, 403 forbidden, 409 conflict
-
-## Example
-
-Input: `/write-test app/services/post_service.py`
-
-Claude will:
-1. Read `app/services/post_service.py`
-2. Identify functions: `get_posts`, `get_post`, `create_post`, `update_post`, `publish_post`, `delete_post`
-3. Create `tests/services/test_post_service.py` with ~130-160 lines covering role filtering, ownership checks, soft delete, and status transitions
-```
-
----
-
-## Skill 2: `/review-pr`
-
-`.claude/skills/review-pr/SKILL.md`:
-
-```markdown
----
-name: review-pr
-description: Review code changes in blog-api against security (ownership checks, require_role dependencies), Pydantic v2 validation, soft delete pattern, and test coverage standards. Use when reviewing PRs or staged changes.
-disable-model-invocation: true
----
-
-# review-pr
-
-## Role
-You are a Senior Python Engineer and Security Reviewer for blog-api. You review code with high standards for security (ownership isolation, role enforcement), code quality, and maintainability.
-
-## Context
-blog-api is a multi-role REST API (admin / author / reader) built with FastAPI and SQLAlchemy. The most critical bugs are:
-1. Missing `require_role()` dependency on an endpoint — any authenticated user can call it
-2. Missing `post.author_id == current_user.id` ownership check — authors can modify other authors' posts
-3. Hard deletes — all deletes must set `deleted_at`, never call `db.delete(obj)`
-4. Missing `deleted_at.is_(None)` filter — soft-deleted records leak into responses
-
-Stack: FastAPI + SQLAlchemy + PostgreSQL + Pydantic v2 + pytest.
-
-## Task
-Review all staged changes (`git diff --staged`) or the file specified in $ARGUMENTS. Provide structured feedback organized by severity.
-
-## Analysis Steps
-
-1. **Security scan** — Highest priority
-   - Does every router endpoint declare a `require_role(...)` dependency (or equivalent)?
-   - Does every update/delete operation verify `post.author_id == current_user.id` (unless admin)?
-   - Is there any `db.delete(obj)` call? (hard delete — must be soft delete)
-   - Are slugs validated for uniqueness before create/update?
-   - Is all input validated via Pydantic schemas? (no raw `dict` or unvalidated `request.json()`)
-
-2. **Data integrity**
-   - Do all queries include a `deleted_at.is_(None)` filter?
-   - Does `get_posts` apply role-based filtering (reader: published only; author: own posts; admin: all)?
-   - Does `publish_post` validate that current status is `"draft"` before transitioning?
-   - Is slug uniqueness enforced at the service layer before writing?
-
-3. **Code quality**
-   - Is there business logic in the router/controller? (not allowed — services only)
-   - Do request/response models use Pydantic v2 schemas?
-   - Do services return SQLAlchemy model instances or Pydantic-validated data? (no raw dicts)
-   - Are exception types correct: `HTTPException(status_code=404)`, `403`, `409`?
-
-4. **Test coverage**
-   - Do new service functions have corresponding pytest tests?
-   - Are ownership checks covered by at least one negative test (403)?
-   - Are soft delete behaviors verified (`deleted_at` is set, `db.delete` is not called)?
-   - Does `conftest.py` provide `mock_db`, `mock_author`, `mock_admin`, `mock_reader` fixtures?
-
-## Output Format
-
-### CRITICAL (must fix before merge)
-[Issues related to security, data integrity, or missing auth]
-
-### WARNING (should fix)
-[Issues related to conventions, missing tests, or incomplete validation]
-
-### SUGGESTION (optional improvement)
-[Nice-to-have improvements]
-
-### LGTM
-[Parts that are well implemented]
-```
+- [ ] Test file path follows convention: `app/services/post_service.py` → `tests/services/test_post_service.py`

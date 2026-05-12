@@ -1,6 +1,6 @@
 # AI Coding Assistant Guide: Claude Code & Cursor
 
-This guide teaches you how to customize and extend two AI coding assistants — **Claude Code** (Anthropic's terminal-based agent) and **Cursor** (AI-powered IDE) — with practical examples from the **saafehouse-be** project.
+A practical guide to customizing and extending **Claude Code** (Anthropic's terminal-based agent) and **Cursor** (AI-powered IDE) with rules, commands, hooks, skills, subagents, MCP, and more.
 
 ---
 
@@ -10,19 +10,20 @@ Both tools let you give the AI persistent context about your project, but they u
 
 | Concept | Claude Code | Cursor | Purpose |
 |---------|------------|--------|---------|
-| **Rules** | `CLAUDE.md` (single file, always active) | `.cursor/rules/*.md` (multiple files, 4 scoping modes) | Tell the AI about your project conventions |
-| **Commands** | `.claude/commands/*.md` (slash commands) | -- | Reusable multi-step workflows |
-| **Hooks** | `.claude/settings.json` hooks | `.cursor/hooks.json` hooks | Auto-run shell commands before/after AI actions |
-| **Skills** | `.claude/commands/*.md` (advanced prompts) | `.agents/skills/*/SKILL.md` | Single-purpose expert workflows |
-| **Subagents** | -- | `.cursor/agents/*.md` | Multi-step specialized agents with own context window |
-| **TDD Workflow** | `/spec-to-tests` skill + Stop hook + Husky | `spec-to-tests` Skill + `stop` hook + Husky | Generate test stubs from spec; run tests before commit |
-| **MCP** | Supported (`~/.claude.json`) | Supported (`~/.cursor/mcp.json`) | Connect external tools (Jira, Confluence, etc.) |
+| **Config** | 4-layer hierarchy (Managed → Global → Project → Directory) | — | Understand what loads, what to commit, what to gitignore |
+| **Rules** | `CLAUDE.md` (stacking layers) + `.claude/rules/` (path-scoped) | `.cursor/rules/*.md` — 4 scoping modes | Tell the AI about your project conventions |
+| **Commands** | `.claude/commands/*.md` — slash commands | — | Reusable multi-step workflows |
+| **Hooks** | `.claude/settings.json` — 10+ events (PreToolUse, Stop, SubagentStart/Stop, PreCompact, ...) | `.cursor/hooks.json` | Auto-run shell commands before/after AI actions |
+| **Skills** | `.claude/skills/*/SKILL.md` or `~/.claude/skills/` (personal). Bundled: `/simplify`, `/debug`, `/review` | `.agents/skills/*/SKILL.md` | Single-purpose expert workflows; auto-invoked by description |
+| **Subagents** | `context: fork` in skills + `claude --worktree`; SubagentStart/Stop hooks | `.cursor/agents/*.md` | Isolated context window for exploration, parallel work, review |
+| **MCP** | `~/.claude.json` | `~/.cursor/mcp.json` | Connect external tools (Jira, GitHub, DB...) |
+| **TDD Workflow** | `/spec-to-tests` skill + Stop hook | `spec-to-tests` skill + stop hook | Generate test stubs from spec; run tests automatically |
 
 ### Key Differences
 
-- **Claude Code** runs in your terminal. It has **Commands** (explicit slash commands) that Cursor does not. Both have **Hooks**, but with different config formats and event names.
-- **Cursor** is a full IDE. Its rules system supports 4 scoping modes. It has **Subagents** (multi-step agents with their own context window, in `.cursor/agents/`) which Claude Code does not have. Skills are stored in `.agents/skills/` and auto-discovered by description.
-- **Both** support MCP (Model Context Protocol) for connecting external tools like Jira and Confluence.
+- **Claude Code** runs in your terminal. It has **Commands** (explicit slash commands) that Cursor does not. It has a rich hook system with 10+ events including `SubagentStop`, `PreCompact`, and `UserPromptSubmit`. Subagents run in fully isolated context windows via `context: fork`.
+- **Cursor** is a full IDE built on VS Code. Its rules system supports 4 scoping modes (always, auto, agent-requested, manual). Subagents live in `.cursor/agents/` as specialized multi-step agents.
+- **Both** support MCP (Model Context Protocol) for connecting to Jira, Confluence, GitHub, databases, and other external tools.
 
 ---
 
@@ -30,21 +31,22 @@ Both tools let you give the AI persistent context about your project, but they u
 
 ### [Claude Code Guide](./claude-code/README.md)
 
-Covers 5 concepts:
-1. **Rules** — `CLAUDE.md` at the project root
-2. **Commands** — Slash commands in `.claude/commands/`
-3. **Hooks** — Automated quality gates in `.claude/settings.json`
-4. **Skills** — Advanced prompt engineering as commands
-5. **TDD Workflow** — Generate test stubs from spec; run tests before commit
+8 sections, 3 learning levels:
+
+| Level | Sections | What You Get |
+|-------|----------|--------------|
+| **Basic** | 00-config → 01-rules → 02-commands → 03-hooks | Config hierarchy, project context, slash commands, auto formatting |
+| **Intermediate** | 04-skills → 05-subagents → 06-mcp | Expert workflows, parallel agents, Jira/GitHub integration |
+| **Advanced** | 07-tdd → 08-tips | TDD automation, token optimization, session management |
 
 ### [Cursor Guide](./cursor/README.md)
 
 Covers 5 concepts:
 1. **Rules** — `.cursor/rules/*.md` with 4 scoping modes
 2. **Skills** — `.agents/skills/*/SKILL.md` with auto-discovery
-3. **Subagents** — `.cursor/agents/*.md` for multi-step specialized tasks
+3. **TDD Workflow** — `spec-to-tests` skill + stop hook
 4. **Hooks** — `.cursor/hooks.json` automated quality gates
-5. **TDD Workflow** — `spec-to-tests` Skill + `stop` hook + Husky
+5. **Subagents** — `.cursor/agents/*.md` for multi-step specialized tasks
 
 ---
 
@@ -54,9 +56,10 @@ Covers 5 concepts:
 |-----------|---------------|
 | You use Cursor as your IDE | Start with the [Cursor Guide](./cursor/README.md) |
 | You prefer terminal workflows | Start with the [Claude Code Guide](./claude-code/README.md) |
-| You use both | Start with Rules in both — they solve the same problem differently |
-| You want automated quality gates | Claude Code has [Hooks](./claude-code/03-hooks/README.md); Cursor does not |
-| You want file-scoped AI behavior | Cursor [Rules](./cursor/01-rules/README.md) support glob patterns natively |
+| You use both | Start with Rules in both — concepts transfer |
+| You want automated quality gates | Both have Hooks; Claude Code has more events (SubagentStop, PreCompact, UserPromptSubmit) |
+| You want file-scoped AI behavior | Cursor Rules support glob patterns natively |
+| You want external tool integration | Both support MCP; see [06-mcp](./claude-code/06-mcp/README.md) |
 
 ---
 
@@ -65,12 +68,15 @@ Covers 5 concepts:
 ### For Claude Code
 
 ```bash
-# Copy rules to your project root
-cp guide/claude-code/01-rules/example-saafehouse.md your-project/CLAUDE.md
+# Copy the working demo config to your project
+cp -r .claude/ your-project/.claude/
 
-# Set up commands
-mkdir -p your-project/.claude/commands
-cp guide/claude-code/02-commands/example-create-module.md your-project/.claude/commands/create-module.md
+# Use the example CLAUDE.md as a starting point
+cp guide/claude-code/01-rules/example-blog.md your-project/CLAUDE.md
+
+# Add personal overrides to .gitignore
+echo ".claude/settings.local.json" >> your-project/.gitignore
+echo "CLAUDE.local.md" >> your-project/.gitignore
 ```
 
 ### For Cursor
@@ -78,9 +84,9 @@ cp guide/claude-code/02-commands/example-create-module.md your-project/.claude/c
 ```bash
 # Copy rules to your project
 mkdir -p your-project/.cursor/rules
-cp guide/cursor/01-rules/example-saafehouse.md your-project/.cursor/rules/
+cp guide/cursor/01-rules/example-*.md your-project/.cursor/rules/
 
-# Set up skills
-mkdir -p your-project/.cursor/skills
-cp -r guide/cursor/02-skills/example-write-test.md your-project/.cursor/skills/
+# Copy skills
+mkdir -p your-project/.agents/skills
+cp -r guide/cursor/02-skills/example-write-test.md your-project/.agents/skills/
 ```

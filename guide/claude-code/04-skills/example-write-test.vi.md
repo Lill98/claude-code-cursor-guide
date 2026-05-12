@@ -1,10 +1,10 @@
-# Example: Skills `/write-test` and `/review-pr` for blog-api
+# Ví dụ: Skill `/write-test` và `/review-pr` cho blog-api
 
-Two skills for the blog-api project (FastAPI + SQLAlchemy + PostgreSQL + Pydantic v2 + pytest).
+Hai skill cho dự án blog-api (FastAPI + SQLAlchemy + PostgreSQL + Pydantic v2 + pytest).
 
-Create `.claude/skills/write-test/SKILL.md` and `.claude/skills/review-pr/SKILL.md` using the content below.
+Tạo `.claude/skills/write-test/SKILL.md` và `.claude/skills/review-pr/SKILL.md` với nội dung bên dưới.
 
-> If you are still using `.claude/commands/`, copying into `.claude/commands/write-test.md` also works.
+> Nếu vẫn đang dùng `.claude/commands/`, copy vào `.claude/commands/write-test.md` cũng hoạt động.
 
 ---
 
@@ -22,56 +22,56 @@ disable-model-invocation: false
 # write-test
 
 ## Role
-You are a Senior Python/FastAPI engineer with expertise in unit testing, pytest, and SQLAlchemy. You have a deep understanding of the blog-api architecture: JWT-based auth, role-based access control (admin / author / reader), Pydantic v2 schemas, and the soft delete pattern.
+Bạn là Senior Python/FastAPI engineer với chuyên môn về unit testing, pytest và SQLAlchemy. Bạn hiểu sâu kiến trúc blog-api: JWT auth, role-based access control (admin / author / reader), Pydantic v2 schema và soft delete pattern.
 
 ## Context
-The blog-api project uses:
-- **pytest** for unit testing
-- **unittest.mock.MagicMock(spec=Session)** to mock the SQLAlchemy session (`mock_db` fixture)
-- Services receive a `db: Session` parameter (no DI container — plain function or class method calls)
-- Every query must filter `deleted_at.is_(None)` to respect the soft delete pattern
-- Authors own their posts: ownership is checked via `post.author_id == current_user.id`
-- Role-based filtering: readers see published posts only; authors see own posts; admins see all
-- Exceptions: `HTTPException` with status codes `404`, `403`, `409`
-- Pydantic v2 schemas are used for all request/response validation
+Dự án blog-api sử dụng:
+- **pytest** cho unit testing
+- **unittest.mock.MagicMock(spec=Session)** để mock SQLAlchemy session (fixture `mock_db`)
+- Service nhận tham số `db: Session` (không dùng DI container — gọi function hoặc method thông thường)
+- Mọi query phải filter `deleted_at.is_(None)` theo soft delete pattern
+- Author sở hữu bài viết của mình: kiểm tra qua `post.author_id == current_user.id`
+- Lọc theo role: reader chỉ thấy bài published; author chỉ thấy bài của mình; admin thấy tất cả
+- Exception: `HTTPException` với status code `404`, `403`, `409`
+- Pydantic v2 schema được dùng cho toàn bộ validation request/response
 
 ## Input
-$ARGUMENTS is the path to the service file that needs tests.
-Example: `app/services/post_service.py`
+$ARGUMENTS là đường dẫn đến file service cần viết test.
+Ví dụ: `app/services/post_service.py`
 
 ## Task
-Read the service file, analyze all public functions/methods, then write comprehensive pytest tests using the project's standard fixture strategy.
+Đọc file service, phân tích tất cả public function/method, sau đó viết pytest test toàn diện theo fixture strategy chuẩn của dự án.
 
 ## Analysis Steps
 
-1. **Read the service file**
-   Read `$ARGUMENTS` and identify:
-   - All public functions or methods
-   - Parameters: `db: Session`, `current_user`, DTOs
-   - SQLAlchemy models being queried (Post, Comment, Tag, User)
-   - HTTPException status codes being raised
+1. **Đọc file service**
+   Đọc `$ARGUMENTS` và xác định:
+   - Tất cả public function hoặc method
+   - Tham số: `db: Session`, `current_user`, DTO
+   - SQLAlchemy model đang query (Post, Comment, Tag, User)
+   - HTTPException status code được raise
 
-2. **Analyze each function**
-   For each function, determine:
-   - Happy path (valid input, record exists, correct role)
-   - Not found case (record does not exist, or `deleted_at` is set)
-   - Forbidden case (author accessing another author's post → 403)
-   - Role-based filtering (reader gets `status == "published"` only)
-   - Ownership check (update/delete verify `post.author_id == current_user.id`)
-   - Soft delete behavior (delete sets `deleted_at`, does not call `db.delete()`)
+2. **Phân tích từng function**
+   Với mỗi function, xác định:
+   - Happy path (input hợp lệ, bản ghi tồn tại, đúng role)
+   - Not found case (bản ghi không tồn tại, hoặc có `deleted_at`)
+   - Forbidden case (author truy cập bài của author khác → 403)
+   - Role-based filtering (reader chỉ nhận `status == "published"`)
+   - Ownership check (update/delete kiểm tra `post.author_id == current_user.id`)
+   - Soft delete behavior (delete đặt `deleted_at`, không gọi `db.delete()`)
 
-3. **Design fixtures**
-   Use pytest fixtures for reusable mock objects:
+3. **Thiết kế fixture**
+   Dùng pytest fixture cho mock object tái sử dụng:
    - `mock_db` — `MagicMock(spec=Session)`
-   - `mock_author`, `mock_admin`, `mock_reader` — User mocks with respective roles
-   - `mock_post` — Post mock with all fields, `author_id` matching `mock_author.id`
+   - `mock_author`, `mock_admin`, `mock_reader` — User mock với role tương ứng
+   - `mock_post` — Post mock với đầy đủ trường, `author_id` khớp với `mock_author.id`
 
-4. **Write tests**
-   Organize by function name. Use `def test_<function>_<scenario>` naming or group into classes.
+4. **Viết test**
+   Tổ chức theo tên function. Dùng cách đặt tên `def test_<function>_<scenario>` hoặc gom vào class.
 
 ## Output Format
 
-Create a test file at `tests/services/test_post_service.py`:
+Tạo file test tại `tests/services/test_post_service.py`:
 
 ```python
 # tests/conftest.py
@@ -145,7 +145,6 @@ def test_get_posts_reader_sees_published_only(mock_db, mock_reader, mock_post):
 
     result = get_posts(db=mock_db, current_user=mock_reader)
 
-    # Verify the status filter was applied
     assert result == [mock_post]
 
 
@@ -196,7 +195,7 @@ def test_get_post_raises_404_when_not_found(mock_db, mock_author):
 
 
 def test_get_post_raises_404_for_soft_deleted_post(mock_db, mock_author):
-    # Soft-deleted posts must not be returned (deleted_at filter)
+    # Bản ghi soft-deleted không được trả về (filter deleted_at)
     mock_db.query.return_value.filter.return_value.first.return_value = None
 
     with pytest.raises(HTTPException) as exc_info:
@@ -213,11 +212,6 @@ def test_create_post_sets_author_id_and_draft_status(mock_db, mock_author):
     post_data.slug = "new-post"
     post_data.content = "Content."
 
-    created_post = MagicMock()
-    created_post.author_id = mock_author.id
-    created_post.status = "draft"
-
-    # Simulate db.add + db.commit + db.refresh pattern
     def fake_refresh(obj):
         obj.id = 10
         obj.author_id = mock_author.id
@@ -235,7 +229,7 @@ def test_create_post_raises_409_for_duplicate_slug(mock_db, mock_author, mock_po
     post_data = MagicMock()
     post_data.slug = "test-post"
 
-    # Slug already exists
+    # Slug đã tồn tại
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
 
     with pytest.raises(HTTPException) as exc_info:
@@ -257,8 +251,7 @@ def test_update_post_succeeds_when_author_owns_it(mock_db, mock_author, mock_pos
 
 
 def test_update_post_raises_403_when_author_does_not_own_it(mock_db, mock_author, mock_post):
-    other_author_id = 50
-    mock_post.author_id = other_author_id  # different owner
+    mock_post.author_id = 50  # chủ sở hữu khác
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
     update_data = MagicMock()
 
@@ -269,7 +262,7 @@ def test_update_post_raises_403_when_author_does_not_own_it(mock_db, mock_author
 
 
 def test_update_post_admin_can_update_any_post(mock_db, mock_admin, mock_post):
-    mock_post.author_id = 999  # different owner, but admin bypasses check
+    mock_post.author_id = 999  # chủ sở hữu khác, nhưng admin bỏ qua kiểm tra
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
     update_data = MagicMock()
     update_data.title = "Admin Edit"
@@ -301,7 +294,7 @@ def test_publish_post_transitions_draft_to_published(mock_db, mock_author, mock_
 
 
 def test_publish_post_raises_403_when_author_does_not_own_it(mock_db, mock_author, mock_post):
-    mock_post.author_id = 50  # different owner
+    mock_post.author_id = 50  # chủ sở hữu khác
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
 
     with pytest.raises(HTTPException) as exc_info:
@@ -332,7 +325,7 @@ def test_delete_post_soft_deletes_by_setting_deleted_at(mock_db, mock_author, mo
 
 
 def test_delete_post_raises_403_when_author_does_not_own_it(mock_db, mock_author, mock_post):
-    mock_post.author_id = 50  # different owner
+    mock_post.author_id = 50  # chủ sở hữu khác
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
 
     with pytest.raises(HTTPException) as exc_info:
@@ -342,7 +335,7 @@ def test_delete_post_raises_403_when_author_does_not_own_it(mock_db, mock_author
 
 
 def test_delete_post_admin_can_delete_any_post(mock_db, mock_admin, mock_post):
-    mock_post.author_id = 999  # different owner
+    mock_post.author_id = 999  # chủ sở hữu khác
     mock_db.query.return_value.filter.return_value.first.return_value = mock_post
 
     delete_post(post_id=1, db=mock_db, current_user=mock_admin)
@@ -361,24 +354,24 @@ def test_delete_post_raises_404_when_post_not_found(mock_db, mock_author):
 ```
 
 ## Quality Checklist
-Before finishing, verify:
-- [ ] Every public function has at least 2 test cases (happy path + error)
-- [ ] Queries are verified to filter `deleted_at.is_(None)`
-- [ ] Ownership checks are tested: author on own post (pass), author on other's post (403)
-- [ ] Role-based filtering is tested: reader gets published only, admin gets all
-- [ ] `publish_post` only allows draft → published transition
-- [ ] `delete_post` uses soft delete (`post.deleted_at = datetime.utcnow()`) — `db.delete()` is never called
-- [ ] All fixtures are defined in `conftest.py` and shared across test modules
-- [ ] HTTPException status codes match: 404 not found, 403 forbidden, 409 conflict
+Trước khi hoàn thành, kiểm tra:
+- [ ] Mỗi public function có ít nhất 2 test case (happy path + error)
+- [ ] Query được xác nhận có filter `deleted_at.is_(None)`
+- [ ] Ownership check được test: author trên bài của mình (pass), author trên bài người khác (403)
+- [ ] Role-based filtering được test: reader chỉ nhận published, admin nhận tất cả
+- [ ] `publish_post` chỉ cho phép chuyển từ draft → published
+- [ ] `delete_post` dùng soft delete (`post.deleted_at = datetime.utcnow()`) — không bao giờ gọi `db.delete()`
+- [ ] Tất cả fixture được định nghĩa trong `conftest.py` và dùng chung giữa các module test
+- [ ] HTTPException status code đúng: 404 not found, 403 forbidden, 409 conflict
 
 ## Example
 
 Input: `/write-test app/services/post_service.py`
 
-Claude will:
-1. Read `app/services/post_service.py`
-2. Identify functions: `get_posts`, `get_post`, `create_post`, `update_post`, `publish_post`, `delete_post`
-3. Create `tests/services/test_post_service.py` with ~130-160 lines covering role filtering, ownership checks, soft delete, and status transitions
+Claude sẽ:
+1. Đọc `app/services/post_service.py`
+2. Xác định các function: `get_posts`, `get_post`, `create_post`, `update_post`, `publish_post`, `delete_post`
+3. Tạo `tests/services/test_post_service.py` với khoảng 130-160 dòng test bao gồm role filtering, ownership check, soft delete và status transition
 ```
 
 ---
@@ -397,58 +390,58 @@ disable-model-invocation: true
 # review-pr
 
 ## Role
-You are a Senior Python Engineer and Security Reviewer for blog-api. You review code with high standards for security (ownership isolation, role enforcement), code quality, and maintainability.
+Bạn là Senior Python Engineer và Security Reviewer của blog-api. Bạn review code với tiêu chuẩn cao về bảo mật (ownership isolation, role enforcement), chất lượng code và khả năng bảo trì.
 
 ## Context
-blog-api is a multi-role REST API (admin / author / reader) built with FastAPI and SQLAlchemy. The most critical bugs are:
-1. Missing `require_role()` dependency on an endpoint — any authenticated user can call it
-2. Missing `post.author_id == current_user.id` ownership check — authors can modify other authors' posts
-3. Hard deletes — all deletes must set `deleted_at`, never call `db.delete(obj)`
-4. Missing `deleted_at.is_(None)` filter — soft-deleted records leak into responses
+blog-api là một REST API đa role (admin / author / reader) xây dựng trên FastAPI và SQLAlchemy. Các bug nghiêm trọng nhất là:
+1. Thiếu dependency `require_role()` trên endpoint — bất kỳ user đã xác thực nào cũng có thể gọi
+2. Thiếu kiểm tra ownership `post.author_id == current_user.id` — author có thể sửa bài của author khác
+3. Hard delete — tất cả xóa phải đặt `deleted_at`, không bao giờ gọi `db.delete(obj)`
+4. Thiếu filter `deleted_at.is_(None)` — bản ghi đã soft-deleted rò rỉ vào response
 
 Stack: FastAPI + SQLAlchemy + PostgreSQL + Pydantic v2 + pytest.
 
 ## Task
-Review all staged changes (`git diff --staged`) or the file specified in $ARGUMENTS. Provide structured feedback organized by severity.
+Review tất cả staged changes (`git diff --staged`) hoặc file được chỉ định trong $ARGUMENTS. Cung cấp feedback có cấu trúc theo mức độ nghiêm trọng.
 
 ## Analysis Steps
 
-1. **Security scan** — Highest priority
-   - Does every router endpoint declare a `require_role(...)` dependency (or equivalent)?
-   - Does every update/delete operation verify `post.author_id == current_user.id` (unless admin)?
-   - Is there any `db.delete(obj)` call? (hard delete — must be soft delete)
-   - Are slugs validated for uniqueness before create/update?
-   - Is all input validated via Pydantic schemas? (no raw `dict` or unvalidated `request.json()`)
+1. **Security scan** — Ưu tiên cao nhất
+   - Mọi endpoint router có khai báo dependency `require_role(...)` không (hoặc tương đương)?
+   - Mọi thao tác update/delete có kiểm tra `post.author_id == current_user.id` không (trừ admin)?
+   - Có bất kỳ lời gọi `db.delete(obj)` nào không? (hard delete — phải là soft delete)
+   - Slug có được kiểm tra uniqueness trước khi create/update không?
+   - Toàn bộ input có được validate qua Pydantic schema không? (không dùng `dict` thô hay `request.json()` chưa validate)
 
 2. **Data integrity**
-   - Do all queries include a `deleted_at.is_(None)` filter?
-   - Does `get_posts` apply role-based filtering (reader: published only; author: own posts; admin: all)?
-   - Does `publish_post` validate that current status is `"draft"` before transitioning?
-   - Is slug uniqueness enforced at the service layer before writing?
+   - Mọi query có filter `deleted_at.is_(None)` không?
+   - `get_posts` có áp dụng role-based filtering không (reader: chỉ published; author: bài của mình; admin: tất cả)?
+   - `publish_post` có validate status hiện tại là `"draft"` trước khi chuyển trạng thái không?
+   - Slug uniqueness có được enforce ở service layer trước khi ghi không?
 
 3. **Code quality**
-   - Is there business logic in the router/controller? (not allowed — services only)
-   - Do request/response models use Pydantic v2 schemas?
-   - Do services return SQLAlchemy model instances or Pydantic-validated data? (no raw dicts)
-   - Are exception types correct: `HTTPException(status_code=404)`, `403`, `409`?
+   - Có business logic trong router/controller không? (không được phép — chỉ service)
+   - Request/response model có dùng Pydantic v2 schema không?
+   - Service có trả về SQLAlchemy model instance hoặc dữ liệu đã validate qua Pydantic không? (không dùng dict thô)
+   - Exception type có đúng không: `HTTPException(status_code=404)`, `403`, `409`?
 
 4. **Test coverage**
-   - Do new service functions have corresponding pytest tests?
-   - Are ownership checks covered by at least one negative test (403)?
-   - Are soft delete behaviors verified (`deleted_at` is set, `db.delete` is not called)?
-   - Does `conftest.py` provide `mock_db`, `mock_author`, `mock_admin`, `mock_reader` fixtures?
+   - Các service function mới có pytest test tương ứng không?
+   - Ownership check có ít nhất một negative test (403) không?
+   - Soft delete behavior có được kiểm tra (`deleted_at` được đặt, `db.delete` không được gọi) không?
+   - `conftest.py` có cung cấp fixture `mock_db`, `mock_author`, `mock_admin`, `mock_reader` không?
 
 ## Output Format
 
-### CRITICAL (must fix before merge)
-[Issues related to security, data integrity, or missing auth]
+### CRITICAL (phải sửa trước khi merge)
+[Vấn đề liên quan đến bảo mật, toàn vẹn dữ liệu, hoặc thiếu auth]
 
-### WARNING (should fix)
-[Issues related to conventions, missing tests, or incomplete validation]
+### WARNING (nên sửa)
+[Vấn đề liên quan đến convention, thiếu test, hoặc validation chưa đầy đủ]
 
-### SUGGESTION (optional improvement)
-[Nice-to-have improvements]
+### SUGGESTION (cải tiến tùy chọn)
+[Cải tiến nên có]
 
 ### LGTM
-[Parts that are well implemented]
+[Những phần được triển khai tốt]
 ```

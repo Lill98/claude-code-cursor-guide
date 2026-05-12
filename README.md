@@ -1,131 +1,142 @@
 # AI Tools Handbook — Claude Code & Cursor
 
-A practical guide to customizing and extending **Claude Code** and **Cursor** — two AI-powered coding tools. Learn how to use Rules, Commands, Hooks, and Skills to make AI assistants work effectively in your projects.
+A practical guide to customizing and extending **Claude Code** and **Cursor** with Rules, Commands, Hooks, Skills, Subagents, MCP, and more.
 
 ## What Are These Tools?
 
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** is an agentic coding tool from Anthropic that runs in your terminal and IDE. It reads your codebase, edits files, runs commands, and helps you build software.
-- **[Cursor](https://www.cursor.com/)** is an AI-powered IDE built on VS Code. Its Agent mode can read, write, and refactor code with awareness of your project context.
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — Anthropic's agentic coding tool. Runs in your terminal and IDE. Reads your codebase, edits files, runs commands, and builds software autonomously.
+- **[Cursor](https://www.cursor.com/)** — AI-powered IDE built on VS Code. Agent mode reads, writes, and refactors code with full project context.
 
-Both tools can be customized to understand your project's stack, conventions, and workflows. This repo teaches you how.
+Both tools can be customized to understand your stack, conventions, and workflows. This repo is a reference handbook and working demo — copy the templates, adapt to your project.
+
+---
 
 ## Repository Structure
 
 ```
-├── guide/                           # Core guide
-│   ├── README.md                    # Overview — comparison of both tools
-│   ├── claude-code/                 # Claude Code specific
-│   │   ├── README.md               # Overview of 4 concepts
-│   │   ├── 01-rules/               # CLAUDE.md — project context
-│   │   ├── 02-commands/            # Slash commands
-│   │   ├── 03-hooks/               # Automated quality gates
-│   │   ├── 04-skills/              # Advanced prompt engineering
-│   │   └── 05-tdd/                 # TDD workflow: spec → tests → implementation
-│   └── cursor/                      # Cursor specific
-│       ├── README.md               # Overview of 4 concepts
-│       ├── 01-rules/               # .cursor/rules/*.mdc files
-│       ├── 02-skills/              # .cursor/skills/*/SKILL.md
-│       ├── 03-tdd/                 # TDD workflow: spec-to-tests Skill + stop hook + Husky
-│       └── 04-hooks/               # .cursor/hooks.json auto-run scripts
+├── guide/
+│   ├── README.md                        # Claude Code vs Cursor comparison
+│   ├── claude-code/                     # Claude Code guide (8 sections)
+│   │   ├── README.md / README.vi.md     # Overview + 3-level learning path
+│   │   ├── 00-config/                   # Config hierarchy — read this first
+│   │   ├── 01-rules/                    # CLAUDE.md, .claude/rules/, @import
+│   │   ├── 02-commands/                 # Slash commands
+│   │   ├── 03-hooks/                    # Auto quality gates (10+ events)
+│   │   ├── 04-skills/                   # Expert workflows (bundled + custom)
+│   │   ├── 05-subagents/                # Multi-agent, worktrees, context isolation
+│   │   ├── 06-mcp/                      # External tools (Jira, GitHub, DB...)
+│   │   ├── 07-tdd/                      # TDD workflow: spec → tests → code
+│   │   └── 08-tips/                     # How Claude works, prompting, token optimization
+│   └── cursor/                          # Cursor guide
+│       ├── README.md
+│       ├── 01-rules/                    # .cursor/rules/*.md — 4 scoping modes
+│       ├── 02-skills/                   # .agents/skills/*/SKILL.md
+│       ├── 03-tdd/                      # TDD workflow
+│       ├── 04-hooks/                    # hooks.json
+│       └── 05-subagents/               # .cursor/agents/
+├── specs/                               # Generated specs from /research-ticket (outputs)
+│   ├── SH-164.md
+│   └── SH-171.md
 ├── setup/
-│   └── atlassian-mcp.md            # Connect Jira/Confluence via MCP
-├── examples/
-│   └── specs/                       # Sample output from AI workflows
-│       └── SH-164.md
-└── .claude/                         # Working Claude Code config (live example)
+│   └── cursor-mcp.md                    # MCP setup for Cursor
+└── .claude/                             # Working demo config (copy to your project)
+    ├── settings.json                    # Hooks: prettier, lint, tests
     ├── commands/
-    │   └── research-ticket.md
-    └── settings.local.json
+    │   └── research-ticket.md           # Live command — fetch Jira → spec
+    ├── skills/
+    │   ├── write-test/SKILL.md
+    │   ├── review-pr/SKILL.md
+    │   └── spec-to-tests/SKILL.md
+    └── hooks/
+        ├── lint-fix.sh
+        ├── prettier-fix.sh
+        └── run-tests.sh
 ```
 
-## Quick Start
+---
 
-### 1. Read the Guide
+## How to Read This Repo
 
-Start with the [Guide Overview](guide/README.md) to understand the concepts and choose your tool:
+**Step 1 — Pick your tool:**
 
-| Tool | Concepts | Start Here |
-|------|----------|------------|
-| **Claude Code** | Rules, Commands, Hooks, Skills, TDD Workflow | [guide/claude-code/](guide/claude-code/README.md) |
-| **Cursor** | Rules, Skills, Subagents, Hooks, TDD Workflow | [guide/cursor/](guide/cursor/README.md) |
+| I use... | Start here |
+|----------|------------|
+| Claude Code | [guide/claude-code/README.md](guide/claude-code/README.md) |
+| Cursor | [guide/cursor/README.md](guide/cursor/README.md) |
+| Both | Read Claude Code first — concepts transfer |
 
-### 2. Concept Comparison
+**Step 2 — Follow the numbered sections in order.** Each section builds on the previous one.
+
+**Step 3 — Copy the working demo** from `.claude/` into your project and adjust.
+
+---
+
+### Claude Code — 3-Level Learning Path
+
+| Level | Sections | What You Get |
+|-------|----------|--------------|
+| **Basic** | 00-config → 01-rules → 02-commands → 03-hooks | Project context, slash commands, auto formatting |
+| **Intermediate** | 04-skills → 05-subagents → 06-mcp | Expert workflows, parallel agents, external tools |
+| **Advanced** | 07-tdd → 08-tips | TDD automation, token optimization, session management |
+
+> Each section has `README.md` (English) + `README.vi.md` (Vietnamese) + `example-*.md` (real-world example).
+
+### Cursor
+
+**Start here:** [guide/cursor/README.md](guide/cursor/README.md)
+
+---
+
+## Concept Comparison
 
 | Concept | Claude Code | Cursor |
 |---------|------------|--------|
-| **Rules** | Single `CLAUDE.md` at project root | Multiple `.cursor/rules/*.md` with 4 scoping modes |
-| **Commands** | `.claude/commands/*.md` slash commands | -- |
-| **Hooks** | `.claude/settings.json` auto-run scripts | `.cursor/hooks.json` auto-run scripts |
-| **Skills** | Advanced commands in `.claude/commands/` | `.agents/skills/*/SKILL.md` with auto-discovery |
-| **Subagents** | -- | `.cursor/agents/*.md` — multi-step agents with own context |
-| **TDD Workflow** | `/spec-to-tests` skill + Stop hook + Husky | `spec-to-tests` Skill + `stop` hook + Husky |
-| **MCP** | Supported | Supported |
+| **Rules** | `CLAUDE.md` (stacking layers) + `.claude/rules/` (path-scoped) | `.cursor/rules/*.md` — 4 scoping modes |
+| **Commands** | `.claude/commands/*.md` — slash commands | — |
+| **Hooks** | `.claude/settings.json` — 10+ events | `.cursor/hooks.json` |
+| **Skills** | `.claude/skills/<name>/SKILL.md` + bundled skills | `.agents/skills/<name>/SKILL.md` |
+| **Subagents** | `context: fork` in skills + `claude --worktree` | `.cursor/agents/*.md` |
+| **MCP** | `~/.claude.json` | `~/.cursor/mcp.json` |
+| **TDD Workflow** | `/spec-to-tests` + Stop hook + Husky | `spec-to-tests` skill + stop hook + Husky |
 
-### 3. Set Up Your Project
+---
 
-**For Claude Code:**
+## Use the Working Demo
 
-```bash
-cp guide/claude-code/01-rules/example-saafehouse.md your-project/CLAUDE.md
-mkdir -p your-project/.claude/commands
-cp guide/claude-code/02-commands/example-create-module.md your-project/.claude/commands/create-module.md
-```
-
-**For Cursor:**
+The `.claude/` folder in this repo is a functional config — not just documentation. Copy it to your project:
 
 ```bash
-mkdir -p your-project/.cursor/rules
-# Create .mdc files from guide/cursor/01-rules/example-saafehouse.md
+# Copy working config to your project
+cp -r .claude/ your-project/.claude/
 
-mkdir -p your-project/.cursor/skills/write-test
-# Create SKILL.md from guide/cursor/02-skills/example-write-test.md
+# Copy CLAUDE.md template
+cp guide/claude-code/01-rules/example-blog.md your-project/CLAUDE.md
+
+# Add to .gitignore
+echo ".claude/settings.local.json" >> your-project/.gitignore
+echo "CLAUDE.local.md" >> your-project/.gitignore
 ```
 
-### 4. Connect External Tools (Optional)
+---
 
-- [Atlassian MCP for Claude Code](setup/atlassian-mcp.md) — Connect Jira & Confluence to Claude Code
-- [MCP for Cursor](setup/cursor-mcp.md) — Reuse the same MCP servers in Cursor (no reinstall needed)
+## Connect External Tools
 
-## What's Inside
+- **Jira + Confluence:** [guide/claude-code/06-mcp/example-atlassian.md](guide/claude-code/06-mcp/example-atlassian.md)
+- **MCP for Cursor:** [setup/cursor-mcp.md](setup/cursor-mcp.md)
 
-### Guide: Claude Code
+---
 
-| Section | What It Covers |
-|---------|---------------|
-| [Rules](guide/claude-code/01-rules/README.md) | `CLAUDE.md` — project context Claude always knows |
-| [Commands](guide/claude-code/02-commands/README.md) | Slash commands for repeatable workflows |
-| [Hooks](guide/claude-code/03-hooks/README.md) | Auto-run ESLint, Prettier, etc. after AI edits |
-| [Skills](guide/claude-code/04-skills/README.md) | Expert personas with prompt engineering |
-| [TDD Workflow](guide/claude-code/05-tdd/README.md) | Generate test stubs from spec; run tests before commit |
+## Each guide section has
 
-### Guide: Cursor
+- `README.md` — concept explanation + template (English)
+- `README.vi.md` — same content in Vietnamese
+- `example-*.md` — real-world example implementing the template
+- `example-*.vi.md` — Vietnamese version of the example
 
-| Section | What It Covers |
-|---------|---------------|
-| [Rules](guide/cursor/01-rules/README.md) | `.md` files — 4 scoping modes (always, intelligent, glob, manual) |
-| [Skills](guide/cursor/02-skills/README.md) | `SKILL.md` in `.agents/skills/` — auto-discovered single-purpose workflows |
-| [Subagents](guide/cursor/05-subagents/README.md) | `.cursor/agents/` — multi-step agents with own context window |
-| [TDD Workflow](guide/cursor/03-tdd/README.md) | `spec-to-tests` Skill + `stop` hook + Husky |
-| [Hooks](guide/cursor/04-hooks/README.md) | Auto-run formatters, tests, and safety gates |
-
-### Examples
-
-- **[SH-164.md](examples/specs/SH-164.md)** — Spec generated from a Jira ticket via the `/research-ticket` command
-- **[.claude/commands/research-ticket.md](.claude/commands/research-ticket.md)** — Live command that fetches Jira tickets via MCP
+---
 
 ## Prerequisites
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and/or [Cursor](https://www.cursor.com/) installed
+- Node.js v20+ (for MCP integrations)
 - A project you want to configure
-- (Optional) Node.js v20+ for MCP integrations
-
-## Contributing
-
-1. Follow the templates in each guide section
-2. Include both a template and a real-world example for each concept
-3. Write in English
-4. Keep documents concise — AI assistants read them on every task
-
-## License
-
-This guide is open for internal and educational use.

@@ -3,3 +3,10 @@
 !.env.example
 node_modules/
 .DS_Store
+
+# Claude Code — local overrides (never commit)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Personal session notes
+claude-session-notes.md

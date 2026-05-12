@@ -1,93 +1,150 @@
 # Claude Code Skills
 
-## Skills vs Commands — Phân biệt mới (2025)
+Skills extend what Claude can do. Store a `SKILL.md` file in `.claude/skills/<name>/` (project-scoped) or `~/.claude/skills/<name>/` (personal), and Claude automatically adds it to its toolkit. Invoke directly with `/skill-name` or let Claude auto-invoke when it detects a match against the skill description.
 
-Skills là first-class feature của Claude Code, **không chỉ là commands phức tạp hơn**:
-
-| | Commands | Skills |
-|---|---|---|
-| **Lưu ở đâu** | `.claude/commands/*.md` | Built-in hoặc `.claude/commands/*.md` |
-| **Trigger** | User gõ `/command-name` | User gõ `/skill-name` **hoặc auto-trigger** theo context |
-| **Cơ chế** | Claude đọc file MD | Claude dùng `Skill` tool để invoke |
-| **Built-in** | Không | Có — nhiều skills pre-installed sẵn |
-| **Persona/Role** | Thường không cần | Thường có role/expertise rõ ràng |
+> **Note:** The legacy `.claude/commands/*.md` format still works (backward compatible). Skills are the recommended format because they support frontmatter, supporting files, and auto-invocation by description.
 
 ---
 
-## Built-in Skills (có sẵn, không cần cài)
+## Bundled Skills (available in every session, no setup needed)
 
-Claude Code hiện ship kèm các skills sau:
+Claude Code ships with built-in skills you can invoke immediately:
 
-| Skill | Trigger | Mô tả |
-|-------|---------|-------|
-| `update-config` | `/update-config` | Cấu hình Claude Code qua `settings.json` (hooks, behaviors) |
-| `keybindings-help` | `/keybindings-help` | Customize keyboard shortcuts trong `~/.claude/keybindings.json` |
-| `simplify` | `/simplify` | Review code vừa thay đổi, refactor cho gọn, chất lượng |
-| `loop` | `/loop 5m /foo` | Chạy lặp lại một command theo interval (mặc định 10m) |
-| `schedule` | `/schedule` | Tạo scheduled remote agents chạy theo cron schedule |
-| `claude-api` | Auto khi import `anthropic` | Hỗ trợ build apps với Claude API / Anthropic SDK |
-| `research-ticket` | `/research-ticket SH-164` | Research Jira ticket → tạo implementation spec |
+| Skill | Usage | Purpose |
+|-------|-------|---------|
+| `/simplify` | `/simplify` | Review changed code for reuse, quality, and efficiency — fix issues found |
+| `/debug` | `/debug [error]` | Systematic debugging workflow |
+| `/batch` | `/batch [task]` | Run a task across multiple files in parallel |
+| `/loop` | `/loop [interval] [task]` | Repeat a task on a recurring schedule |
+| `/claude-api` | `/claude-api` | Build, debug, and optimize Anthropic SDK integrations |
 
-### Ví dụ dùng built-in skills
+These built-in commands are also accessible via the Skill tool:
 
-```bash
-# Chạy /run-tests mỗi 5 phút
-/loop 5m /run-tests
+| Command | Purpose |
+|---------|---------|
+| `/init` | Generate a `CLAUDE.md` from the current codebase |
+| `/review` | Review a pull request |
+| `/security-review` | Security review of changes on the current branch |
 
-# Schedule một agent chạy mỗi sáng
-/schedule
+---
 
-# Review và simplify code vừa edit
-/simplify
+## Skills vs Commands
 
-# Config hooks tự động
-/update-config
+| | Command (`.claude/commands/`) | Skill (`.claude/skills/<name>/`) |
+|--|-------------------------------|----------------------------------|
+| Format | Single `.md` file | Directory with `SKILL.md` + optional supporting files |
+| Frontmatter | Supported | Supported (recommended) |
+| Auto-invocation by Claude | No | Yes — Claude reads `description` and invokes when relevant |
+| Supporting files | No | Yes — templates, examples, scripts |
+| Status | Still works | Recommended for new work |
+
+If both a command and a skill share the same name, the skill takes priority.
+
+---
+
+## Directory Structure
+
+```
+.claude/skills/
+└── write-test/
+    ├── SKILL.md           # Main instructions (required)
+    ├── examples/
+    │   └── sample.spec.ts # Example output
+    └── scripts/
+        └── validate.sh    # Optional helper script
+
+~/.claude/skills/          # Personal skills (apply to all projects)
 ```
 
----
+### Locations and Priority
 
-## Khi nào viết Custom Skill?
+| Location | Path | Scope |
+|----------|------|-------|
+| Personal | `~/.claude/skills/<name>/SKILL.md` | All your projects |
+| Project | `.claude/skills/<name>/SKILL.md` | This project only |
 
-Viết custom skill khi:
-- Workflow phức tạp cần **prompt engineering chi tiết** với role/persona
-- Muốn Claude đóng vai "chuyên gia" trong domain cụ thể (RBAC, test writing...)
-- Cần **few-shot examples** để định hướng output quality
-- Built-in skills không đủ
-
----
-
-## Structure of an Effective Skill
-
-### 1. Role/Persona
-Define what role Claude plays → influences how Claude thinks and what it outputs.
-
-### 2. Context
-Provide specific context that Claude needs to operate correctly.
-
-### 3. Input Format
-Clearly describe what Claude will receive.
-
-### 4. Analysis Steps
-Structured analysis steps — especially important for complex skills.
-
-### 5. Output Format
-Define the exact output format — can include examples (few-shot).
-
-### 6. Few-shot Example (optional)
-Sample input/output — helps Claude understand the expected quality.
+Priority: personal > project. If the same name exists in both, personal wins.
 
 ---
 
-## TEMPLATE
+## SKILL.md Format
+
+Each skill needs a `SKILL.md` with YAML frontmatter followed by markdown instructions:
 
 ```markdown
+---
+name: skill-name
+description: What this skill does and when to use it. Claude uses this field to decide when to invoke automatically.
+disable-model-invocation: false
+allowed-tools: Read Grep
+---
+
+# Skill instructions here
+
+$ARGUMENTS is the input passed when invoked.
+```
+
+### Frontmatter Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | No | Slash-command name (defaults to directory name) |
+| `description` | Recommended | Claude uses this to decide when to auto-invoke. Front-load the key use case. Truncated at 1,536 chars. |
+| `when_to_use` | No | Additional trigger phrases, appended to `description` |
+| `argument-hint` | No | Shown in autocomplete, e.g. `[file-path]` or `[module-name] [type]` |
+| `disable-model-invocation` | No | `true` = only you can invoke (Claude will not auto-trigger). Use for deploy, commit, or side-effect workflows. |
+| `user-invocable` | No | `false` = hidden from `/` menu; Claude auto-invokes only. Use for background reference knowledge. |
+| `allowed-tools` | No | Tools Claude can use without asking permission while this skill is active. E.g. `Bash(git *) Read Grep` |
+| `model` | No | Override the model for this skill |
+| `effort` | No | Override effort level: `low`, `medium`, `high`, `max` |
+| `context` | No | `fork` = run in an isolated subagent |
+| `agent` | No | Subagent type when `context: fork`: `Explore`, `Plan`, `general-purpose`, or a custom subagent name |
+| `paths` | No | Glob patterns — skill only activates when working with matching files, e.g. `**/*.spec.ts` |
+
+### Argument Substitutions
+
+| Variable | Description |
+|----------|-------------|
+| `$ARGUMENTS` | Full argument string after the skill name |
+| `$ARGUMENTS[0]` or `$0` | First argument (0-based index) |
+| `$ARGUMENTS[1]` or `$1` | Second argument |
+| `${CLAUDE_SESSION_ID}` | Current session ID |
+| `${CLAUDE_SKILL_DIR}` | Directory containing this `SKILL.md` |
+
+Example: `/migrate-component SearchBar React Vue` → `$0=SearchBar`, `$1=React`, `$2=Vue`
+
+---
+
+## Invocation Control
+
+| Frontmatter | User can invoke | Claude auto-invokes |
+|-------------|-----------------|---------------------|
+| (default) | Yes | Yes — when description matches |
+| `disable-model-invocation: true` | Yes | No |
+| `user-invocable: false` | No | Yes — when description matches |
+
+**When to use `disable-model-invocation: true`:** `/deploy`, `/commit`, `/send-email`, `/spec-to-tests` — workflows with side effects or where you want to control timing.
+
+**When to use `user-invocable: false`:** Background knowledge like `legacy-system-context` — Claude should know when relevant but it is not an action the user invokes directly.
+
+---
+
+## Template
+
+```markdown
+---
+name: [skill-name]
+description: [What this skill does. Be specific — Claude uses this text to decide when to invoke. Example: "Use when writing pytest unit tests for FastAPI services in blog-api"]
+disable-model-invocation: false
+---
+
 # [Skill Name]
 
 ## Role
-You are a [specific expert role]. You have expertise in [domain] and a deep understanding of [context].
+You are a [specific expert role]. You have expertise in [domain] and deep understanding of [context].
 
 ## Context
-[Describe the project context this skill operates in — tech stack, conventions, patterns]
+[Project-specific context Claude needs — tech stack, conventions, patterns]
 
 ## Input
 $ARGUMENTS is [describe input — e.g., "the path to the service file that needs tests"]
@@ -95,27 +152,19 @@ $ARGUMENTS is [describe input — e.g., "the path to the service file that needs
 ## Task
 [Describe the overall task — 1-2 sentences]
 
-## Analysis Steps
+## Steps
 
-Before creating output, analyze in this order:
+1. **[Step 1]**
+   [Detailed description of what Claude should do]
 
-1. **[Analysis step 1]**
-   - [Details to consider]
-   - [Questions to answer]
+2. **[Step 2]**
+   [Detailed description]
 
-2. **[Analysis step 2]**
-   - [Details to consider]
-
-3. **[Analysis step 3]**
-   - [Details to consider]
+3. **[Step 3]**
+   [Detailed description]
 
 ## Output Format
-
-### [Section 1]
-[Describe section 1 format]
-
-### [Section 2]
-[Describe section 2 format]
+[Describe the exact output format — include examples (few-shot) where possible]
 
 ## Quality Checklist
 Before finishing, verify:
@@ -125,49 +174,24 @@ Before finishing, verify:
 
 ## Example
 
-Input: `[example input]`
+Input: `/[skill-name] example-arg`
 
 Expected output:
-```
+\`\`\`
 [Example output]
-```
+\`\`\`
 ```
 
 ---
 
-## Tips for Writing Skills
+## Tips
 
-- **Strong persona** — "Senior NestJS engineer with 5 years of RBAC experience" → better output than just "engineer"
-- **Few-shot examples** — Provide 1-2 sample outputs, Claude will match the quality
-- **Explicit checklist** — List specific quality criteria, Claude will self-verify
-- **Don't make it too long** — If the skill prompt exceeds 100 lines, consider splitting into 2 skills
-- **Test with edge cases** — Try the skill with "difficult" inputs to check behavior
-- **Prefer built-in skills first** — Trước khi viết custom skill, check xem built-in skills có đủ chưa
-
----
-
-## Loop & Schedule — Automation Skills
-
-Hai skills đặc biệt để tự động hóa:
-
-### `/loop` — Chạy lặp theo interval
-```
-/loop [interval] [command]
-```
-```bash
-# Chạy /run-tests mỗi 5 phút
-/loop 5m /run-tests
-
-# Chạy /check-build mỗi 10 phút (mặc định)
-/loop /check-build
-```
-
-### `/schedule` — Cron jobs cho Claude agents
-Tạo scheduled remote agents chạy tự động theo cron schedule.
-```bash
-/schedule
-# Claude hỏi: command nào? schedule khi nào? → tạo cron trigger
-```
+- **Description is the key** — Write it so Claude knows when to auto-invoke. "Use when writing Vitest tests for NestJS services" is better than just "write-test".
+- **Strong persona** — "Senior NestJS engineer with 5 years RBAC experience" produces better output than "engineer".
+- **`disable-model-invocation: true`** for anything with side effects you want to control.
+- **Keep SKILL.md under 500 lines** — Move detailed reference material into supporting files in the same directory.
+- **`$0`, `$1` for positional args** — `/migrate-component SearchBar React Vue` gives `$0=SearchBar`, `$1=React`, `$2=Vue`.
+- **Supporting files** — Place templates, examples, and scripts in the same directory and reference them from SKILL.md.
 
 ---
 

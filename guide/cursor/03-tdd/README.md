@@ -123,7 +123,7 @@ describe('[ServiceName]', () => {
 User says: "Generate test stubs for SH-164 — the invitation feature"
 
 Agent will:
-1. Read the spec file (e.g. `examples/specs/SH-164.md`)
+1. Read the spec file (e.g. `specs/SH-164.md`)
 2. Extract behaviors from AC01–AC05
 3. Create `src/modules/invitation/invitation.service.spec.ts` with `it.todo()` stubs
 4. Create `src/modules/invitation/invitation.service.ts` scaffold
@@ -139,10 +139,10 @@ Agent will:
    # Paste the SKILL.md content above into .cursor/skills/spec-to-tests/SKILL.md
 
 2. Have a spec file ready — either from /research-ticket or written manually
-   Example: examples/specs/SH-164.md
+   Example: specs/SH-164.md
 
 3. In Cursor chat, say:
-   "Generate test stubs from examples/specs/SH-164.md for the InvitationService"
+   "Generate test stubs from specs/SH-164.md for the InvitationService"
    or:
    "Use spec-to-tests on SH-164 and output to src/modules/invitation/"
 
@@ -274,7 +274,7 @@ git add .husky/pre-commit && git commit -m "chore: add pre-commit test gate"
 | **Auto-run tests after task** | `stop` hook in `.cursor/hooks.json` | `Stop` hook in `.claude/settings.json` |
 | **Hook config file** | `.cursor/hooks.json` | `.claude/settings.json` |
 | **Block commits** | Husky pre-commit (same) | Husky pre-commit (same) |
-| **Invocation** | "generate test stubs from SH-164" | `/spec-to-tests examples/specs/SH-164.md src/...` |
+| **Invocation** | "generate test stubs from SH-164" | `/spec-to-tests specs/SH-164.md src/...` |
 
 Both tools support automatic test feedback after every agent task. The hook config format is different but the behavior is equivalent.
 
